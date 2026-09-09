@@ -1,0 +1,583 @@
+<title>Навигатор Кубыш</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
+<style>
+  :root {
+    --paper: #F2F5F3;
+    --raise: #FBFCFB;
+    --ink: #141C1A;
+    --muted: #5B6D67;
+    --accent: #1E6B58;
+    --accent-soft: #CBE0D7;
+    --warn: #A9512A;
+    --warn-soft: #F0DED4;
+    --rule: #D6DEDA;
+
+    --display: "Newsreader", Georgia, "Times New Roman", serif;
+    --body: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+    --measure: 66ch;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0E1413;
+      --raise: #151D1B;
+      --ink: #E6EDEA;
+      --muted: #93A39D;
+      --accent: #56AE91;
+      --accent-soft: #1C332C;
+      --warn: #D0784C;
+      --warn-soft: #33211A;
+      --rule: #22302C;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #0E1413;
+    --raise: #151D1B;
+    --ink: #E6EDEA;
+    --muted: #93A39D;
+    --accent: #56AE91;
+    --accent-soft: #1C332C;
+    --warn: #D0784C;
+    --warn-soft: #33211A;
+    --rule: #22302C;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+
+  /* ---- shared ---- */
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 14px;
+  }
+
+  section { max-width: var(--measure); }
+
+  h2 {
+    font-family: var(--display);
+    font-size: 29px;
+    font-weight: 500;
+    line-height: 1.22;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0 0 16px;
+  }
+
+  h3 {
+    font-family: var(--body);
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+
+  p { margin: 0 0 16px; }
+  p:last-child { margin-bottom: 0; }
+
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+  strong { font-weight: 600; }
+
+  .lede { font-size: 19px; color: var(--muted); }
+
+  hr.rule {
+    border: 0;
+    border-top: 1px solid var(--rule);
+    margin: 0;
+  }
+
+  /* ---- masthead ---- */
+
+  .masthead .kicker {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 32px;
+  }
+
+  .question {
+    font-family: var(--display);
+    font-size: clamp(31px, 6.4vw, 46px);
+    font-weight: 400;
+    line-height: 1.16;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    margin: 0 0 24px;
+  }
+
+  .question em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .answer {
+    font-size: 19px;
+    max-width: 60ch;
+  }
+
+  /* ---- route ---- */
+
+  .route {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 34px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+  }
+
+  .route::before {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 9px;
+    bottom: 9px;
+    width: 2px;
+    background: var(--accent-soft);
+  }
+
+  .route li { position: relative; }
+
+  .route li::before {
+    content: "";
+    position: absolute;
+    left: -34px;
+    top: 7px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 2px solid var(--accent);
+  }
+
+  .route li:last-child::before {
+    background: var(--accent);
+  }
+
+  .route .step-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .route p { margin: 0; color: var(--muted); }
+
+  /* ---- features ---- */
+
+  .features {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .features > div {
+    padding-left: 16px;
+    border-left: 2px solid var(--rule);
+  }
+
+  .features p { margin: 0; color: var(--muted); }
+
+  /* ---- segments ---- */
+
+  .segments {
+    display: grid;
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .segments > div {
+    background: var(--raise);
+    padding: 18px 20px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 16px;
+    align-items: baseline;
+  }
+
+  .segments .who { font-weight: 600; }
+
+  .segments .cover {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .cover.full { color: var(--accent); }
+  .cover.part { color: var(--muted); }
+  .cover.thin { color: var(--warn); }
+
+  .segments .what {
+    grid-column: 1 / -1;
+    color: var(--muted);
+    font-size: 15.5px;
+  }
+
+  /* ---- facts / numbers ---- */
+
+  .facts {
+    margin: 0;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px 22px;
+    align-items: baseline;
+  }
+
+  .facts dt {
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  .facts dd {
+    margin: 0;
+    color: var(--muted);
+    font-size: 15.5px;
+  }
+
+  /* ---- funnel ---- */
+
+  .funnel-wrap { overflow-x: auto; }
+
+  table.funnel {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 15px;
+    min-width: 380px;
+  }
+
+  table.funnel th,
+  table.funnel td {
+    text-align: right;
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--rule);
+    font-variant-numeric: tabular-nums;
+  }
+
+  table.funnel th:first-child,
+  table.funnel td:first-child {
+    text-align: left;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  table.funnel thead th {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--muted);
+  }
+
+  table.funnel td.now {
+    color: var(--accent);
+    font-weight: 600;
+    font-family: var(--mono);
+  }
+
+  table.funnel td.was {
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+
+  /* ---- trust ---- */
+
+  .trust {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .trust li {
+    padding-left: 26px;
+    position: relative;
+    color: var(--muted);
+  }
+
+  .trust li::before {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 11px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .trust li strong { color: var(--ink); }
+
+  /* ---- honest block ---- */
+
+  .honest {
+    background: var(--warn-soft);
+    border-left: 3px solid var(--warn);
+    padding: 20px 22px;
+    border-radius: 0 3px 3px 0;
+  }
+
+  .honest .eyebrow { color: var(--warn); }
+  .honest p { color: var(--ink); }
+
+  /* ---- ask ---- */
+
+  .ask p { font-size: 18px; }
+
+  .cta {
+    display: inline-block;
+    margin-top: 6px;
+    font-family: var(--mono);
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    padding: 11px 18px;
+    border: 1px solid var(--accent);
+    border-radius: 3px;
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .cta:hover { background: var(--accent); color: var(--paper); }
+
+  footer {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.03em;
+  }
+
+  @media (max-width: 560px) {
+    body { font-size: 16.5px; }
+    .page { padding: 40px 20px 72px; gap: 44px; }
+    h2 { font-size: 25px; }
+    .facts { grid-template-columns: 1fr; gap: 2px 0; }
+    .facts dd { margin-bottom: 10px; }
+    .segments > div { grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<div class="page">
+
+  <header class="masthead">
+    <p class="kicker">Кубыш · iOS · личные финансы</p>
+    <h1 class="question">Сколько я могу потратить сегодня, <em>чтобы не сломать остальное?</em></h1>
+    <p class="answer">Приложение, которое отвечает на этот вопрос каждый день. Не ведет учет, не учит финансовой грамотности и не просит доступ к вашим счетам.</p>
+  </header>
+
+  <hr class="rule">
+
+  <section>
+    <p class="eyebrow">Проблема</p>
+    <h2>Тревога из-за денег появляется не от их нехватки, а от неизвестности</h2>
+    <p>Непонятно, сколько можно потратить сегодня. Непонятно, когда я смогу позволить себе то, что хочу. Непонятно, хватит ли до зарплаты.</p>
+    <p>Из этой неизвестности человек выходит одним из двух способов, и оба плохие. Либо тратит с чувством вины и на всякий случай себя ограничивает. Либо перестает про это думать вообще и не копит никогда. Размер зарплаты тут почти ни при чем: механизм одинаковый и с 21 тысячей в маленьком городе, и с 300 тысячами в Москве.</p>
+    <p>Это не догадка. В опросе на 31 человека самым частым ответом на вопрос «какую одну проблему решить» оказалось <strong>«меньше переживать из-за денег»</strong> — 12 из 31. Это эмоция, а не функция. А главным конкурентом оказались не финансовые приложения, а эксель и «не веду учет вообще»: 23 из 31.</p>
+  </section>
+
+  <hr class="rule">
+
+  <section>
+    <p class="eyebrow">Что это</p>
+    <h2>Первый финансовый навигатор</h2>
+    <p>Навигатор ведет вперед и пересчитывает маршрут на ходу. Приложения для финансов, которые есть на рынке, — это одометр: они показывают пройденный путь. Эксель в этом смысле карта, которую вы рисуете и обновляете сами.</p>
+    <ol class="route">
+      <li>
+        <span class="step-label">Пункт назначения</span>
+        <h3>Вы говорите, куда хотите прийти</h3>
+        <p>Съездить в отпуск, починить зубы, сделать ремонт, поменять машину, собрать подушку. Целей может быть несколько сразу, у каждой свой срок и приоритет.</p>
+      </li>
+      <li>
+        <span class="step-label">Маршрут</span>
+        <h3>Приложение строит план на каждую получку</h3>
+        <p>Не на месяц, а на аванс и зарплату — так, как деньги реально приходят. Сколько отложить, сколько на обязательные платежи, сколько на жизнь. И считает прогнозную дату по каждой цели.</p>
+      </li>
+      <li>
+        <span class="step-label">Дорога и пробки</span>
+        <h3>Каждый день показывает, где вы едете</h3>
+        <p>Бюджет на сегодня, хватит ли денег до следующей получки, есть ли излишек, какой темп трат. Траты вносятся скриншотом из банка, вручную или фразой в чат.</p>
+      </li>
+      <li>
+        <span class="step-label">Пересчет</span>
+        <h3>Перед покупкой отвечает, потянете ли вы ее</h3>
+        <p>Вводите сумму и сразу видите: хватает ли сегодня, откуда возьмутся деньги и на сколько сдвинутся цели. Не хватает — покажет, когда хватит, и предложит альтернативу.</p>
+      </li>
+    </ol>
+  </section>
+
+  <hr class="rule">
+
+  <section>
+    <p class="eyebrow">Внутри</p>
+    <h2>Четыре вещи, которых обычно нет</h2>
+    <div class="features">
+      <div>
+        <h3>«Могу ли я себе это позволить»</h3>
+        <p>Ответ в момент решения, до траты, а не разбор в конце месяца. Реакция зависит от суммы: мелкая покупка не пугает разговорами про отпуск, крупная сразу показывает цену в сдвиге целей.</p>
+      </div>
+      <div>
+        <h3>Трата вносится скриншотом из банка</h3>
+        <p>Кидаете скриншот любого банковского экрана — приложение вытаскивает операции, раскладывает по категориям и выбирает источник списания. Работает и с фото экрана кассы самообслуживания.</p>
+      </div>
+      <div>
+        <h3>Планирование по получкам, а не по месяцам</h3>
+        <p>Аванс и зарплата приходят в разные дни, обязательные платежи привязаны к своим датам. Продукт считает так же, как живет человек.</p>
+      </div>
+      <div>
+        <h3>Виджет, на котором нет сумм</h3>
+        <p>Как идут дела, видно по кольцу и цвету. А сколько у вас денег, посторонний с заблокированного экрана не увидит.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section>
+    <p class="eyebrow">Для кого</p>
+    <h2>Три стадии, и продукт закрывает их по-разному</h2>
+    <div class="segments">
+      <div>
+        <span class="who">Дожить до зарплаты</span>
+        <span class="cover part">закрыто частично</span>
+        <span class="what">Денег до получки не хватает, часто есть кредиты, копить пока не из чего. Обязательные платежи и кредиты продукт учитывает, отдельной работы с долгами нет.</span>
+      </div>
+      <div>
+        <span class="who">Накопить</span>
+        <span class="cover full">основной сегмент</span>
+        <span class="what">До зарплаты хватает, а накопить не выходит. Фоновый стресс от того, что все дорожает и крупное недоступно. Ради этих людей все и строилось.</span>
+      </div>
+      <div>
+        <span class="who">Приумножить</span>
+        <span class="cover thin">закрыто слабо</span>
+        <span class="what">До зарплаты хватает спокойно, но квартира кажется недостижимой, а капитал важно не потерять. Инвестиционного контура в продукте нет.</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section>
+    <p class="eyebrow">Доверие</p>
+    <h2>Почему это безопасно, и это проверяется</h2>
+    <ul class="trust">
+      <li><strong>Банковских интеграций нет вообще.</strong> Доступ к счетам не нужен, вы его и не даете.</li>
+      <li><strong>Вся финансовая математика считается на телефоне.</strong> Не на сервере.</li>
+      <li><strong>Языковую модель к расчету денег не подпускаем.</strong> Она объясняет готовый ответ словами, но не считает его.</li>
+      <li><strong>Приложение не двигает деньги.</strong> Ничего никуда не списывается.</li>
+    </ul>
+  </section>
+
+  <hr class="rule">
+
+  <section>
+    <p class="eyebrow">Как есть на сегодня</p>
+    <h2>Продукт молодой, и это видно</h2>
+
+    <div class="honest">
+      <p class="eyebrow">Честно</p>
+      <p>Приложение в App Store с 9 июля, два месяца. Оно сырое: часть решений неоптимальные, есть места, где я не угадал, ИИ-помощник еще туповат, а удержание слабое — над ним и работаю. Подписку сейчас докручиваю, пока приложение бесплатное целиком.</p>
+    </div>
+
+    <p style="margin-top:26px">При этом установки идут сами, из поиска App Store:</p>
+
+    <dl class="facts">
+      <dt>405</dt><dd>установок всего</dd>
+      <dt>8 в день</dt><dd>за последнюю неделю, растет</dd>
+      <dt>0 ₽</dt><dd>потрачено на рекламу, ни одного поста нигде</dd>
+      <dt>8</dt><dd>версий выпущено, командой из 3 человек</dd>
+    </dl>
+
+    <p style="margin-top:26px">Последняя версия заметно подняла качество первой сессии. Обе когорты в одинаковом окне 7 дней от установки:</p>
+
+    <div class="funnel-wrap">
+      <table class="funnel">
+        <thead>
+          <tr><th scope="col">За 7 дней после установки</th><th scope="col">Первый месяц</th><th scope="col">После 1.5</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Дошли до конца онбординга</td><td class="was">22,8%</td><td class="now">36,5%</td></tr>
+          <tr><td>Довели до готового плана</td><td class="was">11,2%</td><td class="now">29,2%</td></tr>
+          <tr><td>Внесли первую трату</td><td class="was">3,9%</td><td class="now">9,4%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section>
+    <p class="eyebrow">Зачем я это делаю</p>
+    <h2>Сделать нормальное управление деньгами доступным обычному человеку</h2>
+    <p>Не научить инвестировать. Не заставить вести учет. Снять тревогу, заменив ее понятным планом и ответом на вопрос «что мне сделать сейчас».</p>
+    <p>Финансовая тревога — это не про деньги, это про качество жизни. Человек без подушки и без понимания своих финансов принимает худшие решения во всем остальном: держится за плохую работу, откладывает лечение, не уходит оттуда, откуда надо уйти. Подушка безопасности в буквальном смысле дает свободу выбора.</p>
+    <p>А рынок предлагает такому человеку либо курсы, либо таблицы, либо приложения-счетоводы, которые показывают прошлое. Я делаю инструмент, который отвечает на вопрос про будущее, и базовый уровень в нем бесплатный.</p>
+    <p>Само приложение я собрал сам, через ИИ-агентов: кода я не пишу и мобильной разработкой никогда не занимался. Это отдельная история, и она тоже честная — включая то, где ИИ оказался бесполезен.</p>
+  </section>
+
+  <hr class="rule">
+
+  <section class="ask">
+    <p class="eyebrow">Что я прошу</p>
+    <h2>Сначала критику, а не рекламу</h2>
+    <p>Если вы пишете про финансы, продукты или деньги, мне гораздо нужнее ваш взгляд как пользователя: где механика не работает, где я сам себя обманываю и чего не хватает. Приложение бесплатное, доступ давать не надо ничему.</p>
+    <p>А про форматы сотрудничества имеет смысл говорить уже после того, как вы его потрогаете. Мне интереснее платить за результат, чем за размещение.</p>
+    <p><a class="cta" href="https://apps.apple.com/app/id6778792103">Открыть в App Store</a></p>
+  </section>
+
+  <hr class="rule">
+
+  <footer>
+    Кубыш · Кирилл Попов · телеграм-канал проекта @kubyshka_user
+  </footer>
+
+</div>
