@@ -39,11 +39,11 @@
 5. EN subtitle 6. EN keywords 7. EN promo 8. EN description
 
 ```
-Навигатор до получки и к целям
+Навигатор до получки и целей
 ```
 
 ```
-накопления,копилка,копить,подушка,учет,расходов,трат,зарплата,контроль,деньги,лимит,кубышка
+накопления,копилка,копить,подушка,учет,расходов,трат,зарплата,контроль,деньги,бюджет,кубышка
 ```
 
 ```
@@ -51,12 +51,14 @@
 ```
 
 ```
-Кубыш - финансовый навигатор, с которым спокойнее жить от получки до получки. Каждый день видно, сколько можно потратить сегодня и хватает ли денег до зарплаты. А план с каждой получки ведет к тому, чего ты хочешь: отпуск, подушка, ремонт, машина.
+Финансовые приложения обычно показывают прошлое: куда ушли деньги в прошлом месяце. Но тревожит другое - что делать сейчас и хватит ли до зарплаты. А после установки они пустые: сначала заполняешь категории и траты, и только через недели появляется хоть какая-то картина.
 
-ПЛАН ДО ПОЛУЧКИ ЗА ПАРУ МИНУТ
-Не нужно заполнять пустое приложение и разбираться в таблицах. Ответь на несколько вопросов про доход, обязательные платежи и цели - Кубыш сразу соберет план под тебя: бюджет на каждый день, обязательные платежи и сколько отложить с этой получки.
+Кубыш - финансовый навигатор, который смотрит вперед. Он с первых минут настроен под тебя и каждый день показывает, сколько можно потратить сегодня и хватает ли денег до зарплаты. А план с каждой получки ведет к тому, чего ты хочешь: отпуск, подушка, ремонт, машина.
 
-КАЖДЫЙ ДЕНЬ ПОНЯТНЫЕ ЦИФРЫ
+ГОТОВЫЙ ПЛАН СРАЗУ ПОСЛЕ УСТАНОВКИ
+Ответь на несколько вопросов про доход, обязательные платежи и цели - через пару минут у тебя уже есть план до получки: бюджет на каждый день, обязательные платежи и сколько отложить с этой получки. Ничего не нужно заполнять неделями.
+
+СПОКОЙСТВИЕ КАЖДЫЙ ДЕНЬ
 • Сколько можно потратить сегодня - лимит пересчитывается после каждой траты
 • На сколько дней хватит денег и хватает ли до зарплаты
 • Темп: тратишь по плану, экономнее или быстрее
@@ -104,12 +106,14 @@ Worry less about money: Kubysh builds a plan until payday and shows every day ho
 ```
 
 ```
-Kubysh is a money navigator that makes life between paychecks calmer. Every day you see how much you can spend today and whether the money lasts until payday. And the plan from each paycheck takes you towards what you want: a holiday, a safety net, a renovation, a car.
+Money apps usually show the past: where your money went last month. But what actually worries you is what to do now and whether the money lasts until payday. And after you install them they are empty: first you fill in categories and expenses, and only weeks later do you see any picture at all.
 
-A PLAN UNTIL PAYDAY IN MINUTES
-No empty app to fill in and no spreadsheets. Answer a few questions about your income, fixed payments and goals, and Kubysh builds your plan right away: a daily budget, fixed payments and how much to set aside from this paycheck.
+Kubysh is a money navigator that looks ahead. It is set up for you from minute one and shows every day how much you can spend today and whether the money lasts until payday. And the plan from each paycheck takes you towards what you want: a holiday, a safety net, a renovation, a car.
 
-CLEAR NUMBERS EVERY DAY
+A READY PLAN RIGHT AFTER INSTALL
+Answer a few questions about your income, fixed payments and goals, and in a couple of minutes you already have a plan until payday: a daily budget, fixed payments and how much to set aside from this paycheck. Nothing to fill in for weeks.
+
+CALM EVERY DAY
 • How much you can spend today - the limit updates after every expense
 • How many days the money lasts and whether it reaches payday
 • Your pace: on plan, slower or faster
