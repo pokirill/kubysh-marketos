@@ -4,18 +4,15 @@
 
 ### GROWTH-7 — первая short-form acquisition wave после нового релиза — в работе, 16.09.2026
 
-Цель: проверить не «залетают ли ролики», а какой Job/message приводит качественную новую
-когорту. Playbook: `Docs/strategy/CONTENT_GROWTH_PLAYBOOK_2026-09.md`.
+Цель: проверить не «залетают ли ролики», а какой Job/message приводит качественную новую когорту. Актуальный production plan: `Docs/publications/SHORT_VIDEO_PLAN_2026-09-16.md`. Общий playbook: `Docs/strategy/CONTENT_GROWTH_PLAYBOOK_2026-09.md`.
 
 Первая волна:
-- 16.09: `V01 Safe to spend / 180k` + `V02 70k phone / goals`;
-- 17.09: `V03 11 days / pace` + `V04 paycheck`;
-- `V05 Excel` — резерв/пятый тест.
+- 16.09: `V01 Safe / 180k` — P0; `V02 Calm / money affects mood` — P0; `V03 Flex / restaurant overspend` — P1;
+- 17.09: `V04 Afford / thought I couldn't afford it` — P0; `V05 History / bank analytics` — P1; `V06 AI / cushion` — P2 trend experiment.
 
-Для каждого: unique `creative_id`, tagged link где возможно, platform metrics + downstream
-install → onboarding → candidate activation → second session/D1 → monetization.
-Через 48–72 часа — ранний creative review; финальное решение SCALE/ITERATE/KILL не раньше,
-чем когорты дозреют до нужного окна.
+Брендовая рамка: «Живи сейчас, не ломая планы на будущее» + «Бюджет должен подстраиваться под жизнь, а не жизнь под бюджет».
+
+Для каждого: unique `creative_id`, tagged link где возможно, platform metrics + downstream install → onboarding → candidate activation → second session/D1 → monetization. Через 48–72 часа — ранний creative review; финальное решение SCALE/ITERATE/KILL не раньше, чем когорты дозреют до нужного окна. Первым в производство идёт `V01 Safe / 180k`.
 
 ### GROWTH-8 — конкурентный marketing pattern library — выполнено / развивается, 16.09.2026
 
