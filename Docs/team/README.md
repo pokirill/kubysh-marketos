@@ -16,7 +16,7 @@
 | Кто | Бриф |
 |---|---|
 | Марьяна | `Docs/team/BRIEF_MARYANA.md` |
-| Саша | `Docs/team/BRIEF_SASHA.md` |
+| Саша | `Docs/team/BRIEF_SASHA.md`, постановка `Docs/team/sasha/TASK_COMMENTS.md` |
 | Варя | `Docs/team/BRIEF_VARYA.md` |
 
 ## Как сдавать
