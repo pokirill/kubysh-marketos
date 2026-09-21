@@ -60,7 +60,7 @@
 
 **Инстаграм**
 ```
-Скачал приложение для бюджета, открыл, а там пусто. И непонятно, с чего начать.
+Почему приложения для бюджета бросают через пару дней? Мне кажется, потому что после установки там пусто. Сначала неделю заполняешь, и только потом, может быть, что-то поймешь.
 
 Мне хотелось наоборот. В Кубыше онбординг занимает пару минут: доход, обязательные платежи, накопления, цели. После него приложение уже настроено под тебя.
 
@@ -77,7 +77,7 @@
 
 **Тредс**
 ```
-Скачал приложение для бюджета, а там пусто. И непонятно, с чего начать.
+Почему приложения для бюджета бросают через пару дней? Мне кажется, потому что после установки там пусто.
 
 В Кубыше онбординг занимает пару минут: доход, платежи, накопления, цели. После него сразу видно, сколько можешь откладывать в месяц, когда соберешь подушку и план до получки.
 
@@ -381,7 +381,7 @@
 | Пост | Аналогия | Хук на картинке | Промпт (англ., для генерации) |
 |---|---|---|---|
 | 0 | Навигатор в машине ночью: маршрут до точки | «Навигатор для денег» | Night city drive, close-up of a car dashboard GPS screen showing a glowing route to a destination, driver's hands on the wheel, moody dark tones with violet accent light, photorealistic, shallow depth of field, empty space at top, 4:5 |
-| 1 | Переезд: вместо пустой квартиры сразу обжитая комната | «Скачал, а там пусто?» | Split scene: left an empty apartment with bare walls and one cardboard box, right the same room fully furnished and cozy with warm lamp light, photorealistic interior photo, natural colors, space for text at top, 4:5 |
+| 1 | Переезд: вместо пустой квартиры сразу обжитая комната | «Почему приложения для бюджета бросают через пару дней?» + подписи половин «Обычно после установки» / «Кубыш через 2 минуты» | Split scene: left an empty apartment with bare walls and one cardboard box, right the same room fully furnished and cozy with warm lamp light, photorealistic interior photo, natural colors, space for text at top, 4:5 |
 | 2 | Подушка безопасности в машине раскрылась | «Если ИИ заберет работу, на сколько месяцев хватит денег?» | Car interior, white airbag inflated from the steering wheel, calm soft light, no crash, no people injured, clean photorealistic product-style shot, dark background with subtle violet accent, space at top, 4:5 |
 | 3 | Тетрис из жизни: фигуры «ипотека», «продукты», «подарок» падают в стакан | «Пришла зарплата. Начинается тетрис» | Real-life tetris: colorful wooden blocks falling into a glass jar on a kitchen table, some blocks labeled with small paper tags, top-down soft daylight, photorealistic, minimal background, space at top, 4:5 |
 | 4 | Приборная панель: бак = «хватит», спидометр = «темп» | «4 цифры между получками» | Close-up of a modern car instrument cluster at night: fuel gauge, speedometer, trip computer glowing, violet ambient light, photorealistic, sharp focus on the gauges, space at top, 4:5 |
@@ -568,4 +568,16 @@
 Внизу слева мелко: «kubysh.ai», тем же шрифтом, фиолетовым #8D5CFF.
 
 ПРОВЕРЬ перед ответом: текст написан без ошибок, других надписей в кадре нет, формат 4:5.
+```
+
+### Пост 1: правка готовой картинки (21.09.2026)
+
+Первый хук «Скачал приложение, а там пусто?» в ленте непонятен: не сказано, что за приложение и в чем боль
+(замечание Кирилла). Хук теперь называет категорию и боль, а сплит-кадр подписан как сравнение.
+
+```
+Оставь картинку и сцену полностью без изменений.
+Замени текст сверху на: «Почему приложения для бюджета бросают через пару дней?» Тот же жирный белый шрифт, слева, в верхней трети, до 3 строк, переносы только между словами.
+Добавь две короткие подписи в нижней части кадра, над полом, по центру каждой половины: слева «Обычно после установки», справа «Кубыш через 2 минуты». Белый жирный шрифт поменьше заголовка, на полупрозрачной темной плашке со скругленными углами.
+«kubysh.ai» внизу слева оставь как есть. Больше никаких надписей. Проверь текст буква в букву, без буквы «ё».
 ```
