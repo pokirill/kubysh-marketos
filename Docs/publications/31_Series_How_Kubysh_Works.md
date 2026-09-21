@@ -91,7 +91,7 @@
 ## 2. ИИ и работа: на сколько хватит подушки (цели по твоим данным)
 
 **Инфоповод:** страх, что ИИ заберет работу (обсуждается в сентябре 2026). Источник-иноагент не называем, тему берем.
-**Картинки:** S2_1_hook (машина спокойной жизни врезается в ИИ, подушка из рублей; промпт ниже), S2_2 (экран «Через 11 месяцев
+**Картинки:** S2_1_hook.jpg (готово 21.09: машина спокойной жизни уперлась в стену ИИ, подушка из рублей; на картинке хук «Если ИИшка заберет работу, на сколько месяцев хватит денег?», слово «ИИшка» выбрал Кирилл), S2_2, S2_2 (экран «Через 11 месяцев
 у тебя будет подушка», отпуск после подушки)
 
 **Инстаграм** (редакция Кирилла 21.09)
@@ -107,7 +107,7 @@
 Не устраивает дата? Видно, что поменять: срок, сумму или приоритет.
 
 А на сколько месяцев хватит вашей подушки?
-#подушкабезопасности #накопления #ии
+#подушкабезопасности #накопления #ии #нейросети #работавит #увольнение #личныефинансы #финансоваяграмотность #деньги #бюджет
 ```
 
 **Тредс**
@@ -384,7 +384,7 @@
 |---|---|---|---|
 | 0 | Навигатор в машине ночью: маршрут до точки | «Навигатор для денег» | Night city drive, close-up of a car dashboard GPS screen showing a glowing route to a destination, driver's hands on the wheel, moody dark tones with violet accent light, photorealistic, shallow depth of field, empty space at top, 4:5 |
 | 1 | Переезд: вместо пустой квартиры сразу обжитая комната | «Почему приложения для бюджета бросают через пару дней?» + подписи половин «Обычно после установки» / «Кубыш через 2 минуты» | Split scene: left an empty apartment with bare walls and one cardboard box, right the same room fully furnished and cozy with warm lamp light, photorealistic interior photo, natural colors, space for text at top, 4:5 |
-| 2 | Подушка безопасности в машине раскрылась | «Если ИИ заберет работу, на сколько месяцев хватит денег?» | Car interior, white airbag inflated from the steering wheel, calm soft light, no crash, no people injured, clean photorealistic product-style shot, dark background with subtle violet accent, space at top, 4:5 |
+| 2 | Машина спокойной жизни уперлась в стену ИИ, подушка безопасности из рублей (готово) | «Если ИИшка заберет работу, на сколько месяцев хватит денег?» | Car interior, white airbag inflated from the steering wheel, calm soft light, no crash, no people injured, clean photorealistic product-style shot, dark background with subtle violet accent, space at top, 4:5 |
 | 3 | Тетрис из жизни: фигуры «ипотека», «продукты», «подарок» падают в стакан | «Пришла зарплата. Начинается тетрис» | Real-life tetris: colorful wooden blocks falling into a glass jar on a kitchen table, some blocks labeled with small paper tags, top-down soft daylight, photorealistic, minimal background, space at top, 4:5 |
 | 4 | Приборная панель: бак = «хватит», спидометр = «темп» | «4 цифры между получками» | Close-up of a modern car instrument cluster at night: fuel gauge, speedometer, trip computer glowing, violet ambient light, photorealistic, sharp focus on the gauges, space at top, 4:5 |
 | 5 | Прогноз погоды на день | «3 строки вместо графика» | Phone lock screen style weather widget on a kitchen table next to a cup of morning coffee, soft morning light through window, photorealistic lifestyle photo, no brand logos, space at top, 4:5 |
