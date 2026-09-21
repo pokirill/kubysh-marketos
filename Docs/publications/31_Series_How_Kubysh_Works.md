@@ -367,3 +367,28 @@
 Смотрим повестку (@bloodysx, @kontext_channel и др.) и берем только бытовое и деньги. На 21.09: выборы — политика,
 нельзя; дефицит бензина — связан с войной, рискованно; «заберет ли ИИ работу» — можно, ложится на подушку (пост 2).
 Иноагентов не называем и не цитируем, тему брать можно.
+
+## Визуальные аналогии для хук-слайдов (21.09.2026)
+
+Идея Кирилла: первый слайд — не текст на черном, а визуальная аналогия, которая запоминается и сама работает
+хуком. Сквозная метафора бренда — **навигатор и машина** (посты 0, 2, 4, 9), остальное — бытовые аналогии.
+
+**Как делать:** картинка в Higgsfield (или Варя) по промпту ниже, 4:5 (1080×1350), фотореализм, без логотипов
+и без чужих брендов, верхняя треть кадра спокойная под заголовок. Заголовок-хук накладываем поверх тем же шрифтом
+(Montserrat Bold, белый), экран Кубыша идет вторым слайдом как сейчас. Правило генераций: реализм, без
+«смазливости»; кошку Фичу не генерировать, только с оригинальных фото.
+
+| Пост | Аналогия | Хук на картинке | Промпт (англ., для генерации) |
+|---|---|---|---|
+| 0 | Навигатор в машине ночью: маршрут до точки | «Навигатор для денег» | Night city drive, close-up of a car dashboard GPS screen showing a glowing route to a destination, driver's hands on the wheel, moody dark tones with violet accent light, photorealistic, shallow depth of field, empty space at top, 4:5 |
+| 1 | Переезд: вместо пустой квартиры сразу обжитая комната | «Скачал, а там пусто?» | Split scene: left an empty apartment with bare walls and one cardboard box, right the same room fully furnished and cozy with warm lamp light, photorealistic interior photo, natural colors, space for text at top, 4:5 |
+| 2 | Подушка безопасности в машине раскрылась | «Если ИИ заберет работу, на сколько месяцев хватит денег?» | Car interior, white airbag inflated from the steering wheel, calm soft light, no crash, no people injured, clean photorealistic product-style shot, dark background with subtle violet accent, space at top, 4:5 |
+| 3 | Тетрис из жизни: фигуры «ипотека», «продукты», «подарок» падают в стакан | «Пришла зарплата. Начинается тетрис» | Real-life tetris: colorful wooden blocks falling into a glass jar on a kitchen table, some blocks labeled with small paper tags, top-down soft daylight, photorealistic, minimal background, space at top, 4:5 |
+| 4 | Приборная панель: бак = «хватит», спидометр = «темп» | «4 цифры между получками» | Close-up of a modern car instrument cluster at night: fuel gauge, speedometer, trip computer glowing, violet ambient light, photorealistic, sharp focus on the gauges, space at top, 4:5 |
+| 5 | Прогноз погоды на день | «3 строки вместо графика» | Phone lock screen style weather widget on a kitchen table next to a cup of morning coffee, soft morning light through window, photorealistic lifestyle photo, no brand logos, space at top, 4:5 |
+| 6 | Касса самообслуживания: пик, и все разложилось | «Не вноси траты по одной» | Hand holding a smartphone over a neat row of paper receipts on a desk, receipts fanned out and sorted into small labeled trays, photorealistic, soft daylight, minimal, space at top, 4:5 |
+| 7 | Примерочная: примерить покупку к бюджету | «Хочется купить за 8 800. Можно?» | Clothing store fitting room, a jacket on a hanger in front of a mirror, price tag visible but no brand, warm soft light, photorealistic, calm mood, space at top, 4:5 |
+| 8 | Бенто-коробка: одна коробка, много отсеков | «5 целей. 1 счет» | Top-down photo of one bento box with several compartments, each compartment holding neatly rolled paper notes of different colors, dark wooden table, photorealistic, minimal, space at top, 4:5 |
+| 9 | Штурман рядом с водителем с блокнотом маршрута | «Чат, который знает твои цифры» | Rally co-driver in the passenger seat reading pace notes from a notebook to the driver, car interior, focused calm mood, photorealistic, dusk light with violet accents, space at top, 4:5 |
+
+**Порядок:** посты 0 и 1 уже можно выпускать с текущими слайдами. С поста 2 первый слайд — аналогия.
