@@ -66,7 +66,7 @@ def _clean_status(shot):
     sd.rectangle([841*s, 65*s, 845*s, 77*s], fill=(255, 255, 255))
     return shot
 
-def phone(out, headline, segments, shot_path, clean=False):
+def phone(out, headline, segments, shot_path, clean=False, keep_box=None):
     """Слайд с экраном: заголовок в одну-две строки, телефон показан почти целиком."""
     from PIL import ImageFilter
     img = _bg().convert('RGBA'); d = ImageDraw.Draw(img)
@@ -84,6 +84,9 @@ def phone(out, headline, segments, shot_path, clean=False):
     y = _rich(d, segments, 80, y + 6, W - 160, 36, 48)
     shot = Image.open(shot_path).convert('RGB')
     if clean: shot = _clean_status(shot)
+    if keep_box:  # размыть все, кроме прямоугольника [x0,y0,x1,y1] в пикселях исходника (личные приложения, счетчики)
+        from PIL import ImageFilter as _F
+        blurred = shot.filter(_F.GaussianBlur(28)); blurred.paste(shot.crop(tuple(keep_box)), tuple(keep_box[:2])); shot = blurred
     pw = 600; ph = int(shot.height * pw / shot.width); shot = shot.resize((pw, ph), Image.LANCZOS)
     bez = 18; r = 76; px = (W - pw) // 2; py = y + 40
     ph_img = Image.new('RGBA', (pw + 2*bez, ph + 2*bez), (0, 0, 0, 0))
@@ -104,5 +107,5 @@ if __name__ == "__main__" and sys.argv[1] == "--config":
             hook(o, s["lines"], [tuple(x) for x in s.get("segments", [])] or None, s.get("kicker"))
         else:
             shot = s["shot"] if s["shot"].startswith("/") else os.path.join(cfg["shots_dir"], s["shot"])
-            phone(o, s["headline"], [tuple(x) for x in s["segments"]], shot, s.get("clean", False))
+            phone(o, s["headline"], [tuple(x) for x in s["segments"]], shot, s.get("clean", False), s.get("keep_box"))
         print("ok", s["name"])
