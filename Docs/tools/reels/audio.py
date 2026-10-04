@@ -9,9 +9,11 @@ SR = 48000
 # Кастинги: edge — бесплатные многоязычные (с акцентом), yandex — SpeechKit v3 (носители, ключ в YandexSpeechKit.env.txt)
 CASTS = {
     "edge": {"kubysh": ("edge", "de-DE-FlorianMultilingualNeural", "+6%", "+20Hz"),
-             "dush": ("edge", "en-US-EmmaMultilingualNeural", "-8%", "-16Hz")},
+             "dush": ("edge", "en-US-EmmaMultilingualNeural", "-8%", "-16Hz"),
+             "ksy": ("edge", "en-US-AvaMultilingualNeural", "+4%", "+0Hz")},
     "yandex": {"kubysh": ("yandex", "kirill", "good", 1.05),      # выбор Кирилла 03.10: голос 5
-               "dush": ("yandex", "omazh", "evil", 1.0)},         # выбор Кирилла 03.10: голос 4
+               "dush": ("yandex", "omazh", "evil", 1.0),          # выбор Кирилла 03.10: голос 4
+               "ksy": ("yandex", "alena", "neutral", 1.05)},      # черновой голос Ксюши до живой записи
 }
 CAST = CASTS["edge"]
 KEY_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "YandexSpeechKit.env.txt")

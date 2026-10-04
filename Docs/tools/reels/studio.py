@@ -20,6 +20,7 @@ PIV = (540, 880); COIN_C = (278, 391); HEAD = (520, 160); EYE_C = (483, 270)
 INK = (18, 26, 22); YEL = (255, 214, 74); PINK = (255, 132, 150); MINT = (96, 222, 150); WHITE = (255, 255, 255)
 ENC = os.path.join(HERE, "..", "store_cards", "mp4enc")
 OUT_ROOT = "/Users/kirillpopov/Documents/Кубыш доки и артефакты /Рилсы маскот"
+OUT_KSY = "/Users/kirillpopov/Documents/Кубыш доки и артефакты /Рилсы Ксюша"
 SHOTS = "/Users/kirillpopov/Documents/Кубыш доки и артефакты /Скриншоты 1.7/"
 SET_TINT = {"night": (150, 160, 225), "night_lamp": (255, 238, 214)}
 VO_CACHE = os.path.join(HERE, ".cache", "vo")
@@ -128,7 +129,7 @@ def shadow_ellipse(w, h, a):
     return _ELL[key]
 
 
-def put_frog(img, fr, x, y, s, sq=0.0, tilt=0.0, mirror=False, hop=0.0, tint=None):
+def put_frog(img, fr, x, y, s, sq=0.0, tilt=0.0, mirror=False, hop=0.0, tint=None, floor=True):
     if mirror: fr = fr.transpose(Image.FLIP_LEFT_RIGHT)
     pivx = 1024 - PIV[0] if mirror else PIV[0]
     sw, sh = max(2, int(1024 * s * (1 + sq))), max(2, int(1024 * s * (1 - sq)))
@@ -138,7 +139,7 @@ def put_frog(img, fr, x, y, s, sq=0.0, tilt=0.0, mirror=False, hop=0.0, tint=Non
     px, py = pivx * sw / 1024, PIV[1] * sh / 1024
     if tilt: f = f.rotate(tilt, resample=Image.BICUBIC, center=(px, py))
     k = clamp(1 - hop / (500 * s + 1))
-    e = shadow_ellipse(int(620 * s * (0.55 + 0.45 * k)), int(70 * s * (0.6 + 0.4 * k)) + 4, int(130 * k))
+    e = shadow_ellipse(int(620 * s * (0.55 + 0.45 * k)), int(70 * s * (0.6 + 0.4 * k)) + 4, int((130 if floor else 90) * k))
     comp(img, e, x - e.width / 2, y - e.height / 2 + 6 * s)
     a = f.getchannel("A").resize((max(1, sw // 6), max(1, sh // 6))).filter(ImageFilter.GaussianBlur(3)).resize((sw, sh), Image.BILINEAR)
     ds = Image.new("RGBA", (sw, sh), (10, 40, 26, 0)); ds.putalpha(a.point(lambda v: v * 60 // 255))
@@ -150,8 +151,9 @@ class Actor:
     """Персонаж: прыжки, моргание, взгляд на собеседника, речь, реакции, трюки с монетой (Кубыш)."""
     BLEND = 0.09
 
-    def __init__(self, ep, name, who, x, s=0.72, mirror=False, coin=True, pointer=False, hidden=False):
+    def __init__(self, ep, name, who, x, s=0.72, mirror=False, coin=True, pointer=False, hidden=False, ground=GROUND, floor=True):
         self.ep, self.name, self.who, self.x0, self.s, self.mirror = ep, name, who, x, s, mirror
+        self.ground, self.floor = ground, floor
         self.coin_default, self.pointer = coin, pointer
         self.moves, self.exprs, self.looks, self.reacts, self.coin_ev = [], [(0, {})], [], [], []
         self.vis = [(0, not hidden)]
@@ -220,13 +222,13 @@ class Actor:
         lt = [lt for lt in self.looks if lt[0] <= t]
         tgt = lt[-1][1] if lt else None
         x, h, _, _ = self.body(t)
-        sx, sy = to_screen(cam, x, GROUND); s = self.s * cam[2]
+        sx, sy = to_screen(cam, x, self.ground); s = self.s * cam[2]
         if tgt is None and "look" not in tg:
             for a in actors:
                 if a is not self and a.visible(t) and a.talk(t) > 0.08: tgt = a.name
         if isinstance(tgt, str) and tgt in self.ep.actors:
             o = self.ep.actors[tgt]; ox, oh, _, _ = o.body(t)
-            px, py = icon_to_screen(*EYE_C, *to_screen(cam, ox, GROUND), o.s * cam[2], mirror=o.mirror, hop=oh * cam[2])
+            px, py = icon_to_screen(*EYE_C, *to_screen(cam, ox, o.ground), o.s * cam[2], mirror=o.mirror, hop=oh * cam[2])
         elif isinstance(tgt, tuple) and len(tgt) == 3 and tgt[0] == "screen":
             px, py = tgt[1], tgt[2]
         elif isinstance(tgt, tuple):
@@ -275,7 +277,7 @@ class Actor:
     def draw(self, img, t, cam):
         if not self.visible(t): return
         x, h, sq, tilt = self.body(t)
-        sx, sy = to_screen(cam, x, GROUND); s = self.s * cam[2]; hop = h * cam[2]
+        sx, sy = to_screen(cam, x, self.ground); s = self.s * cam[2]; hop = h * cam[2]
         talk = self.talk(t)
         sq += 0.012 * math.sin(2 * math.pi * t / 2.4 + self.phase) + 0.03 * talk
         tilt += 0.8 * math.sin(2 * math.pi * t / 3.7 + self.phase) + 2.4 * talk * math.sin(2 * math.pi * 2.7 * t + self.phase)
@@ -320,7 +322,7 @@ class Actor:
         tint = SET_TINT.get(self.ep.set_at(t))
         fr = frog(who="dush" if self.who == "dush" else "kubysh", coin=coin_in, mouth=mouth, tongue=tongue,
                   pointer=self.pointer, coin_bite=self.bite, **p)
-        put_frog(img, fr, sx, sy, s, sq, tilt, self.mirror, hop, tint)
+        put_frog(img, fr, sx, sy, s, sq, tilt, self.mirror, hop, tint, self.floor)
         if cstate and cstate[0] in ("air", "tongue"):
             cs = coin_sprite(flip=cstate[2] if cstate[0] == "air" else 0.85, bite=self.bite, rot=8 * math.sin(t * 9))
             cs = cs.resize((max(1, int(cs.width * s)), max(1, int(cs.height * s))), Image.LANCZOS)
@@ -345,7 +347,7 @@ class Ep:
         self.actors, self.order = {}, []
         self.cam = Camera(); self.sets = [(0, set_name, 0.0)]
         self.voice, self.sfx_ev, self.caps, self.ov = [], [], [], []
-        self.env = {}; self.chat_slots = []; self.cover_t = 0.8
+        self.env = {}; self.chat_slots = []; self.cover_t = 0.8; self.clips = []
 
     # персонажи и декорации
     def actor(self, name, who, x, **kw):
@@ -381,6 +383,19 @@ class Ep:
         self.cursor = t0 + d + gap
         return t0, t0 + d
 
+    def say(self, who, text, cap=None, at=None, gap=0.16, y=None, size=84, file=None):
+        """Реплика героини в кадре клипа (Ксюша): file — ее живая запись, иначе черновой синтез (CAST[who])."""
+        smp = audio.load(file) if file and os.path.exists(file) else audio.voice(text.replace("*", ""), who, VO_CACHE)
+        t0 = self.cursor if at is None else at; d = len(smp) / audio.SR
+        self.voice.append((t0, smp))
+        words = (cap if cap is not None else text).replace("+", "").split()
+        wts = [max(1, sum(ch in "аеёиоуыэюяАЕЁИОУЫЭЮЯ" for ch in w)) + (0.6 if w[-1] in ".,?!:" else 0) for w in words]
+        tot = sum(wts); acc = 0; times = []
+        for w in wts: times.append(t0 + 0.05 + (d - 0.15) * acc / tot); acc += w
+        self.caps.append(dict(t0=t0, t1=t0 + d + 0.3, words=words, times=times, who=who, y=y, size=size))
+        self.cursor = t0 + d + gap
+        return t0, t0 + d
+
     def wait(self, s): self.cursor += s; return self.cursor
 
     # камера
@@ -388,10 +403,10 @@ class Ep:
         if target == "wide": cx, cy, zz = 540, 960, 1.04
         elif target in self.actors:
             a = self.actors[target]; x, _, _, _ = a.body(t + dur)
-            cx, cy, zz = x, GROUND - 420 * a.s + dy, 1.42
+            cx, cy, zz = x, a.ground - 420 * a.s + dy, 1.42
         elif isinstance(target, tuple) and len(target) == 2 and isinstance(target[0], str):
             a, b = self.actors[target[0]], self.actors[target[1]]
-            cx, cy, zz = (a.body(t)[0] + b.body(t)[0]) / 2, GROUND - 380 * max(a.s, b.s) + dy, 1.12
+            cx, cy, zz = (a.body(t)[0] + b.body(t)[0]) / 2, max(a.ground, b.ground) - 380 * max(a.s, b.s) + dy, 1.12
         else:
             cx, cy, zz = target[0], target[1], 1.2
         self.cam.keys.append((t, cx, cy, z or zz, dur))
@@ -576,9 +591,42 @@ class Ep:
             if k > 0.02: s = scaled(im, k); comp(img, s, x - s.width / 2, y - s.height / 2)
         self.add(t0, t1, "screen", fn)
 
+    def clip(self, t0, t1, path, label, src_t0=0.0):
+        """Видео вместо декорации на [t0, t1): клип Higgsfield (mp4) или заглушка с описанием, если файла еще нет."""
+        self.clips.append(dict(t0=t0, t1=t1, path=path, label=label, src=src_t0, frames=None))
+
+    def _clip_frame(self, c, t):
+        if c["frames"] is None:
+            if c["path"] and os.path.exists(c["path"]):
+                import hashlib
+                d = os.path.join(HERE, ".cache", "clips", hashlib.md5(c["path"].encode()).hexdigest()[:10])
+                if not os.path.isdir(d) or not os.listdir(d):
+                    os.makedirs(d, exist_ok=True)
+                    subprocess.run([os.path.join(HERE, "vframes"), c["path"], d, str(FPS), str(W), str(H)], check=True, capture_output=True)
+                c["frames"] = sorted(os.path.join(d, f) for f in os.listdir(d))
+            else:
+                ph = Image.new("RGB", (W, H)); d = ImageDraw.Draw(ph); P.vgrad(d, (0, 0, W, H), (58, 66, 80), (28, 32, 40))
+                d.rounded_rectangle([60, 300, W - 60, 900], radius=40, outline=(120, 130, 150), width=4)
+                d.text((W // 2, 380), "ЗАГЛУШКА · клип Higgsfield", font=P.font(40, "SemiBold"), fill=(170, 180, 200), anchor="mm")
+                y = 470
+                words = c["label"].split(); line = ""
+                for wd in words:
+                    if P.font(52).getlength(line + " " + wd) > W - 200: d.text((W // 2, y), line.strip(), font=P.font(52), fill=(240, 240, 245), anchor="mm"); y += 70; line = ""
+                    line += " " + wd
+                d.text((W // 2, y), line.strip(), font=P.font(52), fill=(240, 240, 245), anchor="mm")
+                c["frames"] = [ph]
+        fr = c["frames"]; i = min(len(fr) - 1, max(0, int((t - c["t0"] + c["src"]) * FPS)))
+        f = fr[i]
+        return f if isinstance(f, Image.Image) else Image.open(f).convert("RGB")
+
     # ---------- кадр ----------
     def background(self, t, cam):
         cx, cy, z, dx, dy = cam
+        for c in self.clips:
+            if c["t0"] <= t < c["t1"]:
+                f = self._clip_frame(c, t)
+                box = [cx + (0 - 540 - dx) / z, cy + (0 - 960 - dy) / z, cx + (W - 540 - dx) / z, cy + (H - 960 - dy) / z]
+                return f.resize((W, H), Image.BILINEAR, box=box).convert("RGBA")
         box = [(cx + (0 - 540 - dx) / z) * P.SC, (cy + (0 - 960 - dy) / z) * P.SC, (cx + (W - 540 - dx) / z) * P.SC, (cy + (H - 960 - dy) / z) * P.SC]
         cur, prev, fd, ts = self.sets[0][1], None, 0, 0
         for tt, nm, f in self.sets:
@@ -592,7 +640,7 @@ class Ep:
         for i, c in enumerate(self.caps):
             nxt = self.caps[i + 1]["t0"] if i + 1 < len(self.caps) else 999
             if not (c["t0"] <= t < min(c["t1"], nxt)): continue
-            size = c["size"]; hi = YEL if c["who"] == "kubysh" else PINK
+            size = c["size"]; hi = {"kubysh": YEL, "dush": PINK}.get(c["who"], (150, 215, 255))
             ims = []
             for w, tw in zip(c["words"], c["times"]):
                 emph = w.startswith("*") or w.endswith("*") or "*" in w
@@ -627,7 +675,7 @@ class Ep:
         return img
 
     def render(self, preview=None):
-        out_dir = os.path.join(OUT_ROOT, self.name); os.makedirs(out_dir, exist_ok=True)
+        out_dir = os.path.join(OUT_KSY if self.name.startswith("K") else OUT_ROOT, self.name); os.makedirs(out_dir, exist_ok=True)
         N = int(self.dur * FPS); dt = 1 / FPS
         enc = None
         if preview is None:
