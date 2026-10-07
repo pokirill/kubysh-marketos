@@ -229,3 +229,43 @@ def mux(video, wav, out):
     subprocess.run(["afconvert", "-f", "m4af", "-d", "aac", "-b", "192000", wav, m4a], check=True)
     tool = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mux")
     subprocess.run([tool, video, m4a, out], check=True)
+
+
+def beat(dur, bpm=100, start_hit=True):
+    """Синтетическая подложка lo-fi: бочка, хлопок на 2 и 4, хэт восьмыми, бас и мягкий пэд Am–F–C–G.
+    Своя, без лицензий. Громкость сводить низко (0.25–0.35), под голосами еще ниже через Ep.duck."""
+    import random
+    random.seed(7)
+    n = int(dur * SR); out = [0.0] * n; beat_s = 60 / bpm
+    def add(t, sig, g):
+        o = int(t * SR)
+        for i, v in enumerate(sig):
+            if o + i < n: out[o + i] += v * g
+    kick = [math.sin(2 * math.pi * (45 + 75 * math.exp(-i / SR * 18)) * i / SR) * math.exp(-i / SR * 9) for i in range(int(0.35 * SR))]
+    clap = [(random.random() * 2 - 1) * math.exp(-i / SR * 28) for i in range(int(0.18 * SR))]
+    hat = [(random.random() * 2 - 1) * math.exp(-i / SR * 90) for i in range(int(0.05 * SR))]
+    hp = 0.0; hat2 = []
+    for v in hat: hp = 0.6 * hp + v; hat2.append(v - hp * 0.6)
+    roots = [57, 53, 48, 55]; chords = [(57, 60, 64), (53, 57, 60), (48, 52, 55), (55, 59, 62)]
+    f = lambda m: 440 * 2 ** ((m - 69) / 12)
+    bar = 4 * beat_s; t = 0.0; k = 0
+    while t < dur:
+        r = roots[k % 4]; ch = chords[k % 4]
+        for b in range(4):
+            tb = t + b * beat_s
+            if b in (0, 2) or (b == 3 and k % 2): add(tb, kick, 0.9)
+            if b in (1, 3): add(tb, clap, 0.35)
+            add(tb, hat2, 0.12); add(tb + beat_s / 2, hat2, 0.08)
+        bass = [math.sin(2 * math.pi * f(r - 12) * i / SR) * min(1, i / 400) * math.exp(-i / SR * 1.2) for i in range(int(bar * SR))]
+        add(t, bass, 0.35)
+        L = int(bar * SR); pad = [0.0] * L; lp = 0.0
+        for i in range(L):
+            x = sum(((f(m + 12) * i / SR + d) % 1.0) * 2 - 1 for m in ch for d in (0.0, 0.31)) / 6
+            lp += (x - lp) * 0.04
+            pad[i] = lp * min(1, i / (0.3 * SR)) * min(1, (L - i) / (0.2 * SR))
+        add(t, pad, 0.22)
+        t += bar; k += 1
+    if start_hit:
+        add(0.0, [(random.random() * 2 - 1) * math.exp(-i / SR * 6) for i in range(int(0.6 * SR))], 0.25)
+    m = max(1e-6, max(abs(v) for v in out))
+    return [v / m * 0.9 for v in out]
