@@ -133,6 +133,16 @@ def sfx(name):
         for g in (1.0, 0.7):
             n = int(0.16 * SR); e = _env(n, 0.004, 0.05); out += [g * e[i] * math.sin(2 * math.pi * 55 * i / SR) for i in range(n)] + [0.0] * int(0.1 * SR)
         return out
+    if name == "room":  # тихий гул кофейни/помещения, 30 с
+        n = int(30 * SR); nz = _noise(n, 77); out = []; y = 0.0; z = 0.0
+        for i in range(n):
+            y += 0.02 * (nz[i] - y); z += 0.3 * (nz[i] - z); out.append(0.9 * y + 0.04 * z)
+        return out
+    if name == "beep":  # писк терминала оплаты
+        out = []
+        for d in (0.09, 0.09):
+            m = int(d * SR); e = _env(m, 0.003, 0.05); out += [0.35 * e[i] * math.sin(2 * math.pi * 2350 * i / SR) for i in range(m)] + [0.0] * int(0.05 * SR)
+        return out
     raise ValueError(name)
 
 
@@ -167,10 +177,14 @@ def tts(text, who, out_path):
 def load(path):
     """Любой аудиофайл → список float, 48 кГц моно (через afconvert)."""
     wav = path.rsplit(".", 1)[0] + "_48k.wav"
-    if not os.path.exists(wav):
+    if not os.path.exists(wav) or os.path.getmtime(wav) < os.path.getmtime(path):  # исходник новее кэша — пересчитать
         subprocess.run(["afconvert", "-f", "WAVE", "-d", "LEI16@48000", "-c", "1", path, wav], check=True)
-    with wave.open(wav) as w:
-        a = array.array("h"); a.frombytes(w.readframes(w.getnframes()))
+    try:
+        with wave.open(wav) as w:
+            a = array.array("h"); a.frombytes(w.readframes(w.getnframes()))
+    except wave.Error:  # WAVE_FORMAT_EXTENSIBLE от afconvert: внутри тот же PCM 16 бит моно
+        b = open(wav, "rb").read(); i = b.find(b"data")
+        n = int.from_bytes(b[i + 4:i + 8], "little"); a = array.array("h"); a.frombytes(b[i + 8:i + 8 + n - n % 2])
     # срезаем тишину по краям, чтобы реплика начиналась ровно в свою секунду
     th = 300; i0 = next((i for i, v in enumerate(a) if abs(v) > th), 0); i1 = len(a) - next((i for i, v in enumerate(reversed(a)) if abs(v) > th), 0)
     return [v / 32768 for v in a[max(0, i0 - 480):min(len(a), i1 + 2400)]]

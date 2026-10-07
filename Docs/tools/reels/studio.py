@@ -341,6 +341,15 @@ class Actor:
 
 
 # ---------- эпизод ----------
+def _nodot(words):
+    """Точку в конце подписи не ставим (Кирилл, 07.10): «…», «?» и «!» остаются."""
+    if words:
+        w = words[-1]; core = w.rstrip("*")
+        if core.endswith(".") and not core.endswith("..") and not core.endswith("…"):
+            words[-1] = core[:-1] + w[len(core):]
+    return words
+
+
 class Ep:
     def __init__(self, name, set_name="studio"):
         self.name, self.cursor, self.dur = name, 0.0, 10.0
@@ -375,7 +384,8 @@ class Ep:
         env = audio.envelope(smp, FPS); e = self.env.setdefault(who, [0.0] * int(400 * FPS)); f0 = int(t0 * FPS)
         for i, v in enumerate(env):
             if f0 + i < len(e): e[f0 + i] = max(e[f0 + i], v)
-        words = (cap if cap is not None else text).replace("+", "").split()
+        words = (cap if cap is not None else text).replace("+", "").split(" ")
+        words = _nodot([w for w in words if w])
         wts = [max(1, sum(ch in "аеёиоуыэюяАЕЁИОУЫЭЮЯ" for ch in w)) + (0.6 if w[-1] in ".,?!:" else 0) for w in words]
         tot = sum(wts); acc = 0; times = []
         for w in wts: times.append(t0 + 0.05 + (d - 0.15) * acc / tot); acc += w
@@ -383,12 +393,25 @@ class Ep:
         self.cursor = t0 + d + gap
         return t0, t0 + d
 
+    def duck(self, smp, depth=0.25, pad=0.15):
+        """Фон под голосами: где звучит реплика, громкость фона падает до depth (плавно)."""
+        import array as _a
+        SR = audio.SR; g = _a.array("f", [1.0]) * len(smp)
+        for t0, v in self.voice:
+            a, b = int((t0 - pad) * SR), int((t0 + len(v) / SR + pad) * SR)
+            for i in range(max(0, a), min(len(g), b)): g[i] = depth
+        k = 0.0005; out = []; cur = 1.0
+        for i, x in enumerate(smp):
+            cur += (g[i] - cur) * k; out.append(x * cur)
+        return out
+
     def say(self, who, text, cap=None, at=None, gap=0.16, y=None, size=84, file=None):
         """Реплика героини в кадре клипа (Ксюша): file — ее живая запись, иначе черновой синтез (CAST[who])."""
         smp = audio.load(file) if file and os.path.exists(file) else audio.voice(text.replace("*", ""), who, VO_CACHE)
         t0 = self.cursor if at is None else at; d = len(smp) / audio.SR
         self.voice.append((t0, smp))
-        words = (cap if cap is not None else text).replace("+", "").split()
+        words = (cap if cap is not None else text).replace("+", "").split(" ")
+        words = _nodot([w for w in words if w])
         wts = [max(1, sum(ch in "аеёиоуыэюяАЕЁИОУЫЭЮЯ" for ch in w)) + (0.6 if w[-1] in ".,?!:" else 0) for w in words]
         tot = sum(wts); acc = 0; times = []
         for w in wts: times.append(t0 + 0.05 + (d - 0.15) * acc / tot); acc += w
@@ -597,7 +620,9 @@ class Ep:
 
     def _clip_frame(self, c, t):
         if c["frames"] is None:
-            if c["path"] and os.path.exists(c["path"]):
+            if c["path"] and c["path"].lower().endswith(".png") and os.path.exists(c["path"]):
+                c["frames"] = [Image.open(c["path"]).convert("RGB").resize((W, H), Image.LANCZOS)]
+            elif c["path"] and os.path.exists(c["path"]):
                 import hashlib
                 d = os.path.join(HERE, ".cache", "clips", hashlib.md5(c["path"].encode()).hexdigest()[:10])
                 if not os.path.isdir(d) or not os.listdir(d):
@@ -652,6 +677,12 @@ class Ep:
                 cw += (sp if lines[-1] else 0) + im.width; lines[-1].append((im, tw))
             y0 = c["y"] if c["y"] is not None else 1290
             lh = int(size * 1.25); out = seg(t, min(c["t1"], nxt) - 0.12, min(c["t1"], nxt))
+            av = getattr(self, "avatars", {}).get(c["who"])
+            if av is not None and lines and t >= c["times"][0]:   # портрет говорящего слева от первой строки
+                w0 = sum(im.width for im, _ in lines[0]) + sp * (len(lines[0]) - 1); x0 = (W - w0) / 2 - 20
+                k = back(seg(t, c["t0"], c["t0"] + 0.2), 1.6)
+                a = fade(scaled(av, max(0.05, k)), 1 - out)
+                comp(img, a, max(10, x0 - a.width - 6), y0 + (int(size * 1.1) - a.height) / 2 + 10)
             for li, ln in enumerate(lines):
                 width = sum(im.width for im, _ in ln) + sp * (len(ln) - 1); x = (W - width) / 2 - 20
                 for im, tw in ln:
@@ -697,7 +728,7 @@ class Ep:
         if enc is None: return out_dir
         enc.stdin.close(); enc.wait()
         soft = {"tick": 0.5, "pop": 0.6, "msg": 0.6, "ding": 0.6, "marker": 0.5, "clink": 0.6, "swish": 0.5, "hop": 0.6, "whoosh": 0.7}
-        ev = [(t, smp, 1.0) for t, smp in self.voice] + [(t, audio.sfx(n), g * soft.get(n, 1.0)) for t, n, g in self.sfx_ev]
+        ev = [(t, smp, getattr(self, "vgain", 1.0)) for t, smp in self.voice] + list(getattr(self, "extra", [])) + [(t, audio.sfx(n), g * soft.get(n, 1.0)) for t, n, g in self.sfx_ev]
         wav = os.path.join(out_dir, "_mix.wav"); audio.mix(ev, self.dur, wav)
         label = {"yandex": "Яндекс", "edge": "Edge"}.get(getattr(self, "cast", ""), "")
         final = os.path.join(out_dir, f"{self.name}{'_' + label if label else ''}.mp4"); audio.mux(silent, wav, final)
