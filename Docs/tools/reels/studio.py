@@ -573,8 +573,8 @@ class Ep:
         for c in self.chat_slots:
             if c["t1"] > t: c["t1"] = t + 0.2
 
-    def notif(self, t0, t1, title, body):
-        im = P.notification(title, body); self.sfx(t0, "ding", 0.5)
+    def notif(self, t0, t1, title, body, **kw):
+        im = P.notification(title, body, **kw); self.sfx(t0, "ding", 0.5)
         def fn(img, t, cam):
             p = back(seg(t, t0, t0 + 0.35), 1.2) * (1 - eio(seg(t, t1 - 0.3, t1)))
             comp(img, im, (W - im.width) / 2, lerp(-240, 170, p))

@@ -350,11 +350,11 @@ def notes_card(lines, scroll=0.0, w=760, h=980):
     return im
 
 
-def notification(title, body, w=980):
+def notification(title, body, w=980, icon="₽", color=(40, 160, 96)):
     im = Image.new("RGBA", (w, 210), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
     d.rounded_rectangle([0, 0, w - 1, 209], radius=48, fill=(250, 250, 252, 246))
-    d.rounded_rectangle([36, 46, 156, 166], radius=30, fill=(40, 160, 96, 255))
-    d.text((96, 106), "₽", font=font(80), fill=(255, 255, 255, 255), anchor="mm")
+    d.rounded_rectangle([36, 46, 156, 166], radius=30, fill=color + (255,))
+    d.text((96, 106), icon, font=font(80), fill=(255, 255, 255, 255), anchor="mm")
     d.text((188, 76), title, font=font(44), fill=(20, 22, 26, 255), anchor="lm")
     d.text((w - 40, 76), "сейчас", font=font(34, "Medium"), fill=(140, 142, 150, 255), anchor="rm")
     d.text((188, 140), body, font=font(42, "Medium"), fill=(40, 42, 48, 255), anchor="lm")
