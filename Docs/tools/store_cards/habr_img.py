@@ -31,6 +31,6 @@ for i,t in enumerate(items):
 im.save(OUT+'2_checklist.png')
 # 3. limits humor
 im,d=bg(); d.text((90,70),'Кто у соло-разработчика тимлид',font=f('Bold',62),fill=INK)
-box(d,90,230,680,420,'Часовой лимит\n\n= обед',size=58); box(d,830,230,680,420,'Недельный лимит\n\n= выходной',fill=GREEN,col=(255,255,255),size=58)
+box(d,90,230,680,420,'5-часовой лимит\n\n= обед',size=58); box(d,830,230,680,420,'Недельный лимит\n\n= выходной',fill=GREEN,col=(255,255,255),size=58)
 d.text((90,730),'Задача в файле и коммит после каждого шага: обрыв ничего не стоит',font=f('SemiBold',34),fill=GREEN); im.save(OUT+'3_cover.png')
 print('ok')
