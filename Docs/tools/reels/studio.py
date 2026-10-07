@@ -519,12 +519,12 @@ class Ep:
             comp(img, im, px - im.width / 2, py - im.height / 2)
         self.add(t0, t1, "front" if world else "screen", fn)
 
-    def counter(self, t0, t1, a, b, x, y, size=150, suffix=" ₽", color=WHITE, dur=0.6, prefix=""):
-        self.sfx(t0, "tick", 0.3); self.sfx(t0 + dur, "ding", 0.4)
+    def counter(self, t0, t1, a, b, x, y, size=150, suffix=" ₽", color=WHITE, dur=0.6, prefix="", sound=True, pop=True):
+        if sound: self.sfx(t0, "tick", 0.3); self.sfx(t0 + dur, "ding", 0.4)
         def fn(img, t, cam):
             p = eout(seg(t, t0, t0 + dur)); v = int(round(lerp(a, b, p)))
             s = prefix + f"{v:,}".replace(",", " ") + suffix
-            k = back(seg(t, t0, t0 + 0.25)) * (1 + 0.1 * pulse(t, t0 + dur, t0 + dur + 0.25)) * (1 - ease(seg(t, t1 - 0.2, t1)))
+            k = (back(seg(t, t0, t0 + 0.25)) if pop else 1) * (1 + 0.1 * pulse(t, t0 + dur, t0 + dur + 0.25)) * (1 - ease(seg(t, t1 - 0.2, t1)))
             if k < 0.02: return
             im = scaled(word_img(s, size, fill=color), k)
             comp(img, im, x - im.width / 2, y - im.height / 2)
@@ -580,6 +580,31 @@ class Ep:
             comp(img, im, (W - im.width) / 2, lerp(-240, 170, p))
         self.add(t0, t1, "screen", fn)
 
+    def balance(self, steps, t1, x=540, y=1170, size=120):
+        """Баланс, который меняется ступеньками: steps = [(t, сумма)], каждая ступень — короткий пересчет."""
+        for i, (t, v) in enumerate(steps):
+            if i == 0: continue
+            nt = steps[i + 1][0] if i + 1 < len(steps) else t1
+            self.counter(t, nt, steps[i - 1][1], v, x, y, size=size, dur=0.3, sound=False, pop=(i == 1))
+
+    def pushes(self, items, t1, y0=150, scale=0.86, **kw):
+        """Каскад пушей: items = [(t, title, body)], новый въезжает сверху и сдвигает старые вниз, видно до 4."""
+        ims = [scaled(P.notification(ti, bo, **kw), scale) for _, ti, bo in items]
+        step = ims[0].height + 14
+        for t, _, _ in items: self.sfx(t, "ding", 0.35)
+        def fn(img, t, cam):
+            out = 1 - eio(seg(t, t1 - 0.3, t1))
+            shown = [i for i, it in enumerate(items) if it[0] <= t]
+            for rank, i in enumerate(reversed(shown)):
+                if rank > 3: break
+                p = back(seg(t, items[i][0], items[i][0] + 0.3), 1.2)
+                slot = rank - 1 + p if rank == 0 else rank
+                if rank > 0:  # сдвиг вниз, пока въезжает новый
+                    nt = items[shown[-1]][0]; slot = rank - 1 + back(seg(t, nt, nt + 0.3), 1.2)
+                y = y0 + slot * step if rank > 0 else lerp(-step, y0, p)
+                comp(img, ims[i], (W - ims[i].width) / 2, y + (1 - out) * -400)
+        self.add(items[0][0], t1, "screen", fn)
+
     def title(self, t0, t1, lines, sub=None, bg=(14, 22, 18)):
         self.sfx(t0, "boom", 0.7)
         def fn(img, t, cam):
@@ -614,9 +639,10 @@ class Ep:
             if k > 0.02: s = scaled(im, k); comp(img, s, x - s.width / 2, y - s.height / 2)
         self.add(t0, t1, "screen", fn)
 
-    def clip(self, t0, t1, path, label, src_t0=0.0):
-        """Видео вместо декорации на [t0, t1): клип Higgsfield (mp4) или заглушка с описанием, если файла еще нет."""
-        self.clips.append(dict(t0=t0, t1=t1, path=path, label=label, src=src_t0, frames=None))
+    def clip(self, t0, t1, path, label, src_t0=0.0, speed=1.0):
+        """Видео вместо декорации на [t0, t1): клип Higgsfield (mp4) или заглушка с описанием, если файла еще нет.
+        speed < 0 — перемотка назад от src_t0."""
+        self.clips.append(dict(t0=t0, t1=t1, path=path, label=label, src=src_t0, speed=speed, frames=None))
 
     def _clip_frame(self, c, t):
         if c["frames"] is None:
@@ -640,7 +666,7 @@ class Ep:
                     line += " " + wd
                 d.text((W // 2, y), line.strip(), font=P.font(52), fill=(240, 240, 245), anchor="mm")
                 c["frames"] = [ph]
-        fr = c["frames"]; i = min(len(fr) - 1, max(0, int((t - c["t0"] + c["src"]) * FPS)))
+        fr = c["frames"]; i = min(len(fr) - 1, max(0, int((c["src"] + (t - c["t0"]) * c.get("speed", 1.0)) * FPS)))
         f = fr[i]
         return f if isinstance(f, Image.Image) else Image.open(f).convert("RGB")
 
