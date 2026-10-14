@@ -639,21 +639,26 @@ class Ep:
             if k > 0.02: s = scaled(im, k); comp(img, s, x - s.width / 2, y - s.height / 2)
         self.add(t0, t1, "screen", fn)
 
-    def clip(self, t0, t1, path, label, src_t0=0.0, speed=1.0):
+    def clip(self, t0, t1, path, label, src_t0=0.0, speed=1.0, phone=None):
         """Видео вместо декорации на [t0, t1): клип Higgsfield (mp4) или заглушка с описанием, если файла еще нет.
-        speed < 0 — перемотка назад от src_t0."""
-        self.clips.append(dict(t0=t0, t1=t1, path=path, label=label, src=src_t0, speed=speed, frames=None))
+        speed < 0 — перемотка назад от src_t0. phone=(ширина, cx, cy, цвет фона) — запись экрана айфона без растяжения,
+        со скругленными углами и тенью."""
+        self.clips.append(dict(t0=t0, t1=t1, path=path, label=label, src=src_t0, speed=speed, frames=None, phone=phone))
 
     def _clip_frame(self, c, t):
         if c["frames"] is None:
             if c["path"] and c["path"].lower().endswith(".png") and os.path.exists(c["path"]):
                 c["frames"] = [Image.open(c["path"]).convert("RGB").resize((W, H), Image.LANCZOS)]
+            elif c["path"] and os.path.isdir(c["path"]):  # папка кадров с точным временем (запись экрана с переменной частотой)
+                fs = [f for f in os.listdir(c["path"]) if f.endswith(".png")]
+                c["frames"] = [os.path.join(c["path"], f) for f in sorted(fs, key=lambda x: int(x.split("_")[-1].split(".")[0]))]
             elif c["path"] and os.path.exists(c["path"]):
                 import hashlib
-                d = os.path.join(HERE, ".cache", "clips", hashlib.md5(c["path"].encode()).hexdigest()[:10])
+                fw, fh = (c["phone"][0], int(c["phone"][0] * 2622 / 1206)) if c.get("phone") else (W, H)
+                d = os.path.join(HERE, ".cache", "clips", hashlib.md5((c["path"] + f"{fw}x{fh}").encode()).hexdigest()[:10])
                 if not os.path.isdir(d) or not os.listdir(d):
                     os.makedirs(d, exist_ok=True)
-                    subprocess.run([os.path.join(HERE, "vframes"), c["path"], d, str(FPS), str(W), str(H)], check=True, capture_output=True)
+                    subprocess.run([os.path.join(HERE, "vframes"), c["path"], d, str(FPS), str(fw), str(fh)], check=True, capture_output=True)
                 c["frames"] = sorted(os.path.join(d, f) for f in os.listdir(d))
             else:
                 ph = Image.new("RGB", (W, H)); d = ImageDraw.Draw(ph); P.vgrad(d, (0, 0, W, H), (58, 66, 80), (28, 32, 40))
@@ -668,7 +673,18 @@ class Ep:
                 c["frames"] = [ph]
         fr = c["frames"]; i = min(len(fr) - 1, max(0, int((c["src"] + (t - c["t0"]) * c.get("speed", 1.0)) * FPS)))
         f = fr[i]
-        return f if isinstance(f, Image.Image) else Image.open(f).convert("RGB")
+        f = f if isinstance(f, Image.Image) else Image.open(f).convert("RGB")
+        if c.get("phone"):
+            pw, cx, cy, bg = c["phone"]
+            if f.width != pw: f = f.resize((pw, int(f.height * pw / f.width)), Image.LANCZOS)
+            cv = Image.new("RGB", (W, H), bg); m = Image.new("L", f.size, 0)
+            ImageDraw.Draw(m).rounded_rectangle([0, 0, f.width - 1, f.height - 1], radius=int(pw * 0.11), fill=255)
+            sh = Image.new("RGBA", (f.width + 80, f.height + 80), (0, 0, 0, 0)); ImageDraw.Draw(sh).rounded_rectangle([40, 50, f.width + 40, f.height + 40], radius=int(pw * 0.11), fill=(0, 0, 0, 90))
+            from PIL import ImageFilter as _F
+            cv.paste(sh.filter(_F.GaussianBlur(22)), (int(cx - f.width / 2 - 40), int(cy - f.height / 2 - 40)), sh.filter(_F.GaussianBlur(22)))
+            cv.paste(f, (int(cx - f.width / 2), int(cy - f.height / 2)), m)
+            return cv
+        return f
 
     # ---------- кадр ----------
     def background(self, t, cam):

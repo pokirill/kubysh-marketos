@@ -91,10 +91,13 @@ def build():
         x0, x1 = ep.say("kubysh", "", cap=cap, at=t, file=VO + f"v3f_{i + 3}.wav", y=1560, size=68)
         c.append((x0, x1)); t = x1 + (0.3 if i != 3 else 0.7)
     (s3a, s3b), (s4a, s4b), (s5a, s5b), (s6a, s6b), (s7a, s7b) = c; s2a = p0
-    s8a = s7b + 0.3; s8b = s8a + 3.4  # экран плана: «Япония к апрелю» без голоса
+    s8a = s7b + 0.3
+    h0, h1 = ep.say("kubysh", "", cap="Внесла трату — я сразу пересчитываю: сколько можно *сегодня* и *хватит ли* до зарплаты",
+                    at=s8a + 0.3, file=VO + "пересчет_f.wav", y=1720, size=60)
+    s8b = h1 + 0.4
     cta0 = s8b + 0.2
-    g0, g1 = ep.say("kubysh", "", cap="Напиши в комментариях слово «план» — пришлю приложение. До следующей зарплаты — бесплатно",
-                    at=cta0 + 0.3, file=VO + "v3f_9.wav", y=1400, size=64)
+    g0, g1 = ep.say("kubysh", "", cap="Я — *Кубыш,* приложение для денег на айфоне. Напиши в комментариях слово *«план»* — пришлю ссылку",
+                    at=cta0 + 0.3, file=VO + "бренд_f.wav", y=1400, size=64)
     loop0 = g1 + 0.3; ep.dur = loop0 + 0.9
 
     def state(t):
@@ -149,19 +152,20 @@ def build():
     ep.pill(s7a + 3.2, s8a, "Завтра 4 347", 540, 1330, size=56, bg=(200, 160, 30), fg=INK)
     ep.pill(s7a + 3.6, s8a, "Экономия +1 450 — твоя", 540, 1440, size=46, **GREEN)
 
-    # склейка по форме: сегодняшний кусок → экран плана Ксюши
-    def bg(img, t, cam_): ImageDraw.Draw(img).rectangle([0, 0, W, H], fill=TABLE)
-    ep.add(s8a, cta0, "screen", bg)
-    ep.card(s8a, cta0, PLAN, keys=[(s8a, (0, 330, 1206, 2100), 540, 700, 760), (s8a + 0.9, (0, 1150, 1206, 1760), 540, 640, 1000)],
-            marks=[(s8a + 1.2, (60, 1330, 1150, 1700), MINT)])
-    ep.pill(s8a + 0.2, cta0, "У каждой цели — своя дата", 540, 230, size=50, **DARK)
-    for i, txt in enumerate(["Подушка — к декабрю", "Япония — к апрелю", "Алтай — к августу", "Новый айфон — к сентябрю"]):
-        ep.pill(s8a + 1.3 + i * 0.45, cta0, txt, 540, 1060 + i * 100, size=46, **GREEN); ep.sfx(s8a + 1.3 + i * 0.45, "pop", 0.4)
-    ep.sfx(s8a, "boom", 0.4)
+    # склейка по форме: сегодняшний кусок → настоящая «Получка»: трата 1 500 и пересчет метрик
+    REC = R + "Запись_экрана/poluchka_trata.mp4"; PH = (700, 540, 830, TABLE)
+    mid = s8a + 1.9
+    ep.clip(s8a, mid, R + "Запись_экрана/poluchka_P1", "P1", src_t0=0.2, phone=PH)
+    ep.clip(mid, s8b, R + "Запись_экрана/poluchka_P2b", "P2", src_t0=0.0, phone=PH)
+    ep.sfx(s8a, "boom", 0.4); ep.sfx(mid + 0.2, "ding", 0.5)
+    ep.pill(s8a + 0.2, mid, "Трата 1 500", 540, 120, size=48, **DARK)
+    ep.pill(mid + 0.4, s8b, "Пересчитано сразу", 540, 120, size=48, **GREEN)
 
     # призыв: Кубыш в кадре
     ep.clip(cta0, loop0 + 1.0, R + "K03_клипы/C5.mp4", "C5", src_t0=0.6)
-    ep.pill(g0 + 0.3, loop0, "Напиши «план» — пришлю приложение", 540, 330, size=46, **DARK)
-    ep.pill(g0 + 2.5, loop0, "До следующей зарплаты — бесплатно", 540, 440, size=40, **GREEN)
+    from episodes.k00_ad import icon as _icon
+    _icon(ep, g0, loop0, y=700, size=240)
+    ep.pill(g0 + 0.2, loop0, "Кубыш · приложение для денег на iPhone", 540, 330, size=42, **DARK)
+    ep.pill(g0 + 2.6, loop0, "Напиши в комментариях «план»", 540, 440, size=46, **GREEN)
     ep.cover_t = 0.9
     return ep
