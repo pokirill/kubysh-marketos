@@ -770,7 +770,7 @@ class Ep:
         if enc is None: return out_dir
         enc.stdin.close(); enc.wait()
         soft = {"tick": 0.5, "pop": 0.6, "msg": 0.6, "ding": 0.6, "marker": 0.5, "clink": 0.6, "swish": 0.5, "hop": 0.6, "whoosh": 0.7}
-        ev = [(t, smp, getattr(self, "vgain", 1.0)) for t, smp in self.voice] + list(getattr(self, "extra", [])) + [(t, audio.sfx(n), g * soft.get(n, 1.0)) for t, n, g in self.sfx_ev]
+        ev = [(t, smp, getattr(self, "vgain", 1.0)) for t, smp in self.voice] + list(getattr(self, "extra", [])) + [(t, audio.sfx(n), g * soft.get(n, 1.0) * getattr(self, "sfxgain", 1.0)) for t, n, g in self.sfx_ev]
         wav = os.path.join(out_dir, "_mix.wav"); audio.mix(ev, self.dur, wav)
         label = {"yandex": "Яндекс", "edge": "Edge"}.get(getattr(self, "cast", ""), "")
         final = os.path.join(out_dir, f"{self.name}{'_' + label if label else ''}.mp4"); audio.mux(silent, wav, final)

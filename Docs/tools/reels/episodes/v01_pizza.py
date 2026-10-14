@@ -74,6 +74,7 @@ class Pizza:
 def build():
     ep = Ep("V01_Зарплата_пицца", "studio")
     ep.vgain = 0.95
+    ep.sfxgain = 0.4  # Кирилл 14.10: нож и системные звуки выделялись
     ep.avatars = {w: Image.open(R + f"Референсы/avatar_{w}.png").convert("RGBA") for w in ("ksy", "kubysh", "dush")}
     pz = Pizza()
 
@@ -145,7 +146,7 @@ def build():
     ep.pill(s4a + 1.5, s8a, "Копилка · 40 000", 760, 1000, size=44, **GREEN)
     ep.pill(s5a + 2.0, s7a, "16 дней до аванса", 540, 1330, size=46, **DARK)
     ep.counter(s6a + 0.6, s7a, 0, 4250, 540, 430, size=120, color=MINT)
-    ep.sfx(s3a + 0.4, "swish", 0.4); ep.sfx(s4a + 1.5, "kaching", 0.5); [ep.sfx(s5a + 0.3 + (i / DAYS * 0.8 + 0.1) * 1.9, "tick", 0.3) for i in range(DAYS)]; ep.sfx(s6a + 0.5, "ding", 0.5)
+    ep.sfx(s3a + 0.4, "swish", 0.4); ep.sfx(s4a + 1.5, "kaching", 0.5); [ep.sfx(s5a + 0.3 + (i / DAYS * 0.8 + 0.1) * 1.9, "tick", 0.12) for i in range(DAYS)]; ep.sfx(s6a + 0.5, "ding", 0.5)
     for i, hh in enumerate(["10:00", "13:00", "16:00", "19:00", "21:00"]):  # таймлапс дня
         ep.pill(s7a + 0.2 + i * 0.35, s7a + 0.55 + i * 0.35, hh, 540, 430, size=64, **DARK); ep.sfx(s7a + 0.2 + i * 0.35, "tick", 0.3)
     ep.notif(s7a + 2.0, s8a, "Кубыш", "Потрачено 2 800 из 4 250", icon="К", color=(30, 130, 88))
