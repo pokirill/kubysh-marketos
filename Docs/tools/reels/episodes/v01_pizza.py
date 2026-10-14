@@ -1,108 +1,164 @@
-"""V1 · «Зарплата — это пицца» (серия «Осознанно = круто», ~28 с). Понятно даже ребенку: зарплату режем как пиццу —
-кусок на обязательное, кусок сразу в копилку, остальное на дни до аванса; сегодняшний кусок — 4 250, его едим спокойно.
-Финал — настоящий «стартовый план» Ксюши из приложения. CTA: «напиши ПЛАН». Голоса: Кубыш Holden, Душная — клон.
+"""V1 · «Зарплата — это пицца» v3 (~30 с, петля). Фотореалистичная пицца режется маской по фото, под куском — пустая доска.
+Крючки СДВГ: старт с результата и перемотка назад, вопрос в первой секунде, стоп-кадр с ответом, петля в конце.
+Голос = подпись дословно. Камера (скилл camera-moves): отъезд-удар в хуке, перемотка, переброска к Душной, наезд,
+поворот за ножом, стоп-кадр, таймлапс дня, склейка по форме в экран плана, наплыв в первый кадр.
 """
 import math
-from PIL import ImageDraw
+from PIL import Image, ImageDraw, ImageFilter, ImageChops
 from studio import *  # noqa
 
 R = "/Users/kirillpopov/Documents/Кубыш доки и артефакты /Рилсы Ксюша/"
+F = "/Users/kirillpopov/Documents/Кубыш доки и артефакты /Рилсы маскот/V01_Зарплата_пицца/"
 VO = "/Users/kirillpopov/Documents/Кубыш доки и артефакты /Голоса/V_серия/"
 PLAN = R + "Запись_экрана/стартовый_план_ксюши.png"
-BG = (246, 240, 230)
-CX, CY, RAD = 540, 790, 330
-TOTAL, MUST, PIG = 138000, 30000, 40000
-DAYS = 16
+CX, CY, RAD = 540, 766, 462
+TOTAL, MUST, PIG, DAYS = 138000, 30000, 40000, 16
+PLATE, JAR = (122, 118), (940, 1368)
 GREEN = dict(bg=(30, 130, 88), fg=WHITE)
-DARK = dict(bg=(60, 50, 90), fg=WHITE)
+DARK = dict(bg=(40, 34, 30), fg=WHITE)
+TABLE = (214, 200, 182)
 
 
-def angles():
-    a_must = 360 * MUST / TOTAL; a_pig = 360 * PIG / TOTAL
-    return (-90, -90 + a_must), (-90 + a_must, -90 + a_must + a_pig), (-90 + a_must + a_pig, 270)
+class Pizza:
+    def __init__(self):
+        self.board = Image.open(F + "board.png").convert("RGBA").resize((W, H), Image.LANCZOS)
+        self.photo = Image.open(F + "pizza.png").convert("RGB").resize((W, H), Image.LANCZOS)
+        am = 360 * MUST / TOTAL; ap = 360 * PIG / TOTAL
+        self.must = self.wedge(-90, -90 + am)
+        self.pig = self.wedge(-90 + am, -90 + am + ap)
+        r0 = -90 + am + ap; st = (270 - r0) / DAYS
+        self.days = [self.wedge(r0 + i * st, r0 + (i + 1) * st) for i in range(DAYS)]
 
+    def wedge(self, a0, a1):
+        m = Image.new("L", (W, H), 0)
+        ImageDraw.Draw(m).pieslice([CX - RAD, CY - RAD, CX + RAD, CY + RAD], a0, a1, fill=255)
+        box = m.getbbox(); piece = self.photo.crop(box).convert("RGBA"); piece.putalpha(m.crop(box))
+        sh = Image.new("RGBA", piece.size, (0, 0, 0, 0)); sh.putalpha(piece.getchannel("A").point(lambda v: int(v * 0.45)))
+        sh = sh.filter(ImageFilter.GaussianBlur(14))
+        mid = math.radians((a0 + a1) / 2)
+        return dict(img=piece, shadow=sh, dir=(math.cos(mid), math.sin(mid)), c=((box[0] + box[2]) / 2, (box[1] + box[3]) / 2))
 
-def pizza_layer(ep, t0, t1, tm, tp, tc, tt):
-    """tm — уходит кусок «обязательное», tp — кусок в копилку, tc — режем остаток на дни, tt — сегодняшний кусок."""
-    (m0, m1), (p0, p1), (r0, r1) = angles()
-    step = (r1 - r0) / DAYS
-    def slice_(d, a0, a1, off, color, k=1.0):
-        mid = math.radians((a0 + a1) / 2); dx, dy = math.cos(mid) * off, math.sin(mid) * off
-        rr = RAD * k
-        box = [CX + dx - rr, CY + dy - rr, CX + dx + rr, CY + dy + rr]
-        d.pieslice(box, a0, a1, fill=(214, 150, 74))
-        inner = [box[0] + 22 * k, box[1] + 22 * k, box[2] - 22 * k, box[3] - 22 * k]
-        d.pieslice(inner, a0, a1, fill=color)
-        for j in range(3):  # пепперони
-            ang = math.radians(a0 + (a1 - a0) * (j + 0.5) / 3); r = rr * (0.45 + 0.18 * (j % 2))
-            px, py = CX + dx + math.cos(ang) * r, CY + dy + math.sin(ang) * r
-            if (a1 - a0) > 12: d.ellipse([px - 26 * k, py - 26 * k, px + 26 * k, py + 26 * k], fill=(196, 60, 48))
-    def fn(img, t, cam):
-        d = ImageDraw.Draw(img)
-        d.rectangle([0, 0, W, H], fill=BG)
-        pin = back(seg(t, t0, t0 + 0.45), 1.4)
-        if pin < 0.02: return
-        cheese = (250, 214, 120)
-        om = 160 * eio(seg(t, tm, tm + 0.6)); op = 160 * eio(seg(t, tp, tp + 0.6))
-        slice_(d, m0, m1, om, (236, 236, 236) if t > tm else cheese, pin)
-        slice_(d, p0, p1, op, (255, 190, 200) if t > tp else cheese, pin)
-        cut = seg(t, tc, tc + 1.4)
-        for i in range(DAYS):
-            a0 = r0 + i * step; a1 = a0 + step
-            pop = 90 * back(seg(t, tt, tt + 0.5), 1.6) if i == 0 else 0
-            col = MINT if (i == 0 and t > tt) else cheese
-            slice_(d, a0, a1, pop, col, pin)
-        if cut > 0:  # линии разреза появляются по кругу
-            for i in range(int(DAYS * cut) + 1):
-                ang = math.radians(r0 + i * step)
-                d.line([CX, CY, CX + math.cos(ang) * RAD * pin, CY + math.sin(ang) * RAD * pin], fill=(150, 98, 40), width=6)
-        if t < tm:
-            s = scaled(word_img("138 000 ₽", 110, fill=WHITE), pin); comp(img, s, CX - s.width / 2, CY - s.height / 2)
-    ep.add(t0, t1, "screen", fn)
+    def place(self, cv, w, dx=0.0, dy=0.0, k=1.0, lift=0.0, alpha=1.0, ring=None):
+        img, sh = w["img"], w["shadow"]
+        if abs(k - 1) > 0.003:
+            img = img.resize((max(1, int(img.width * k)), max(1, int(img.height * k))), Image.BILINEAR); sh = sh.resize(img.size, Image.BILINEAR)
+        if alpha < 0.999:
+            if alpha <= 0.01: return
+            img = img.copy(); img.putalpha(img.getchannel("A").point(lambda v: int(v * alpha)))
+        x = int(w["c"][0] + dx - img.width / 2); y = int(w["c"][1] + dy - img.height / 2)
+        if lift > 0.01: cv.alpha_composite(sh, (x + int(18 * lift), y + int(26 * lift)))
+        ox, oy = x - int(4 * lift), y - int(8 * lift)
+        cv.alpha_composite(img, (ox, oy))
+        if ring:
+            a = img.getchannel("A"); o = ImageChops.subtract(a.filter(ImageFilter.MaxFilter(17)), a)
+            col = Image.new("RGBA", img.size, ring + (255,)); col.putalpha(o); cv.alpha_composite(col, (ox, oy))
+
+    def frame(self, s):
+        cv = self.board.copy()
+        m = eio(s["must"]); w = self.must
+        self.place(cv, w, (PLATE[0] - w["c"][0]) * m, (PLATE[1] - w["c"][1]) * m, lerp(1, 0.42, m), lift=math.sin(math.pi * m) + 0.2 * m)
+        p = eio(s["pig"]); w = self.pig
+        self.place(cv, w, (JAR[0] - w["c"][0]) * p, (JAR[1] - w["c"][1]) * p, lerp(1, 0.22, p), lift=math.sin(math.pi * p),
+                   alpha=1 - seg(s["pig"], 0.85, 1.0))
+        gap = 9 * eio(s["cut"])
+        for i, w in enumerate(self.days):
+            dx, dy, k, lift, ring = w["dir"][0] * gap, w["dir"][1] * gap, 1.0, 0.0, None
+            if i == 0 and s["today"] > 0:
+                tk = back(s["today"], 1.6); dx += w["dir"][0] * 120 * tk; dy += w["dir"][1] * 120 * tk; k = 1 + 0.14 * tk; lift = tk; ring = MINT
+            if i == 1 and s["tomorrow"] > 0:
+                tk = back(s["tomorrow"], 1.6); dx += w["dir"][0] * 40 * tk; dy += w["dir"][1] * 40 * tk; k = 1 + 0.12 * tk; lift = 0.6 * tk; ring = YEL
+            self.place(cv, w, dx, dy, k, lift=lift, ring=ring)
+        return cv
 
 
 def build():
     ep = Ep("V01_Зарплата_пицца", "studio")
     ep.vgain = 0.95
-    from PIL import Image as _I
-    ep.avatars = {w: _I.open(R + f"Референсы/avatar_{w}.png").convert("RGBA") for w in ("ksy", "kubysh", "dush")}
+    ep.avatars = {w: Image.open(R + f"Референсы/avatar_{w}.png").convert("RGBA") for w in ("ksy", "kubysh", "dush")}
+    pz = Pizza()
 
-    # 1 · хук: огромное число на светлом фоне
-    a0, a1 = ep.say("kubysh", "", cap="Пришла зарплата. Сколько можно потратить *сегодня?*", at=0.2, file=VO + "п1.wav", y=1450)
-    def big(img, t, cam):
-        d = ImageDraw.Draw(img); d.rectangle([0, 0, W, H], fill=BG)
-        k = back(seg(t, 0.0, 0.4), 1.6)
-        s = scaled(word_img("138 000 ₽", 170, fill=INK, stroke=BG), k); comp(img, s, 540 - s.width / 2, 760)
-    ep.add(0, a1 + 0.1, "screen", big)
+    # голоса и тайминг (подпись = голос дословно)
+    a0, a1 = ep.say("kubysh", "", cap="Сто тридцать восемь тысяч. Сколько можно потратить *сегодня?*", at=0.25, file=VO + "v3f_1.wav", y=1560, size=70)
+    d0 = a1 + 0.35
+    b0, b1 = ep.say("dush", "", cap="Нисколько… Потратишь сейчас — и не увидишь, как цветет *сакура* в Японии", at=d0 + 0.1, file=VO + "д_сакура_f.wav", y=1400, size=70)
+    p0 = b1 + 0.25
+    caps = ["Первый кусок — *обязательное:* аренда и коммуналка",
+            "Второй — сразу в *копилку:* подушка и Япония", "Остальное режу на *шестнадцать дней* до аванса",
+            "Сегодня твой кусок — *четыре двести пятьдесят*",
+            "Потратила меньше — я пересчитал. Завтра кусок *больше,* а сэкономленное — *твое*"]
+    c, t = [], p0
+    for i, cap in enumerate(caps):
+        x0, x1 = ep.say("kubysh", "", cap=cap, at=t, file=VO + f"v3f_{i + 3}.wav", y=1560, size=68)
+        c.append((x0, x1)); t = x1 + (0.3 if i != 3 else 0.7)
+    (s3a, s3b), (s4a, s4b), (s5a, s5b), (s6a, s6b), (s7a, s7b) = c; s2a = p0
+    s8a = s7b + 0.3; s8b = s8a + 1.6  # экран плана: «Япония к апрелю» без голоса
+    cta0 = s8b + 0.2
+    g0, g1 = ep.say("kubysh", "", cap="Напиши в комментариях слово «план» — пришлю приложение. До следующей зарплаты — бесплатно",
+                    at=cta0 + 0.3, file=VO + "v3f_9.wav", y=1400, size=64)
+    loop0 = g1 + 0.3; ep.dur = loop0 + 0.9
 
-    # 2 · Душная на своем крупном плане (клип К2: губы на 0,7–2,0 и 3,5–5,0 с)
-    s2 = a1 + 0.1
-    b0, b1 = ep.say("dush", "", cap="Нисколько… а вдруг не *хватит?*", at=s2 + 0.1, file=VO + "д_нисколько.mp3", y=1400)
-    cut = b0 + 1.15; s3 = b1 + 0.15
-    ep.clip(s2, cut, R + "K02_клипы/S1b.mp4", "D1", src_t0=0.6)
-    ep.clip(cut, s3, R + "K02_клипы/S1b.mp4", "D2", src_t0=3.45)
+    def state(t):
+        if t < d0:  # хук: результат, затем перемотка к целой пицце
+            r = 1 - eio(seg(t, 1.7, 2.5))
+            return dict(must=r, pig=r, cut=r, today=r, tomorrow=0)
+        return dict(must=seg(t, s3a + 0.4, s3a + 1.6), pig=seg(t, s4a + 0.4, s4a + 1.7), cut=seg(t, s5a + 0.3, s5a + 2.2),
+                    today=seg(t, s6a + 0.3, s6a + 0.8), tomorrow=seg(t, s7a + 3.0, s7a + 3.6))
 
-    # 3 · пицца: обязательное, копилка, дни, сегодняшний кусок
-    c0, c1 = ep.say("kubysh", "", cap="Смотри, зарплата — это *пицца*", at=s3 + 0.15, file=VO + "п2.wav", y=1450)
-    d0, d1 = ep.say("kubysh", "", cap="Первый кусок — *обязательное*", at=c1 + 0.2, file=VO + "п3.wav", y=1450)
-    e0, e1 = ep.say("kubysh", "", cap="Второй — в *копилку,* сразу, пока не съели", at=d1 + 0.2, file=VO + "п4.wav", y=1450)
-    f0, f1 = ep.say("kubysh", "", cap="Остальное режем на *дни* до аванса", at=e1 + 0.2, file=VO + "п5.wav", y=1450)
-    g0, g1 = ep.say("kubysh", "", cap="Сегодня твой кусок — *4 250.* И его можно съесть *спокойно*", at=f1 + 0.2, file=VO + "п6.wav", y=1450, size=74)
-    pizza_layer(ep, s3, g1 + 0.3, d0 + 0.3, e0 + 0.3, f0 + 0.2, g0 + 0.8)
-    ep.pill(d0 + 0.6, g1 + 0.3, "Обязательное 30 000", 790, 330, size=40, bg=(90, 90, 96), fg=WHITE)
-    ep.pill(e0 + 0.6, g1 + 0.3, "Копилка 40 000", 800, 1090, size=40, bg=(214, 80, 110), fg=WHITE)
-    ep.pill(f0 + 0.8, g1 + 0.3, "16 дней до аванса", 540, 1330, size=46, **DARK)
-    ep.counter(g0 + 0.9, g1 + 0.3, 0, 4250, 540, 1225, size=110, color=MINT)
-    ep.sfx(d0 + 0.3, "swish", 0.4); ep.sfx(e0 + 0.3, "kaching", 0.5); ep.sfx(f0 + 0.2, "scribble", 0.4)
+    today_c = pz.days[0]["c"]
+    def cam(t):
+        if t < d0:
+            k = eout(seg(t, 0.0, 0.55))
+            return lerp(1.9, 1.0, k) * (1 + 0.04 * seg(t, 2.5, d0)), lerp(today_c[0], CX, k), lerp(today_c[1], CY, k), 0.0
+        z = 1.0 + 0.06 * seg(t, s2a, s3a); rot = -7 * eio(seg(t, s5a + 0.3, s5a + 2.2))
+        k = eio(seg(t, s6a + 0.3, s6a + 0.9)) * (1 - eio(seg(t, s7a, s7a + 0.6)))
+        return z + 0.35 * k, lerp(CX, today_c[0], k), lerp(CY, today_c[1], k), rot
 
-    # 4 · настоящий план Ксюши в приложении + призыв
-    h0, h1 = ep.say("kubysh", "", cap="Я режу так каждую зарплату. За *две минуты*", at=g1 + 0.4, file=VO + "п7.wav", y=1480, size=68)
-    tE = h1 + 2.4
-    def bg2(img, t, cam):
-        ImageDraw.Draw(img).rectangle([0, 0, W, H], fill=BG)
-    ep.add(g1 + 0.3, tE, "screen", bg2)
-    ep.card(g1 + 0.35, tE, PLAN, keys=[(g1 + 0.35, (0, 330, 1206, 2100), 540, 760, 760)], marks=[(h0 + 0.8, (60, 1330, 1150, 1700), MINT)])
-    ep.pill(h1 + 0.2, tE, "Напиши ПЛАН — пришлю, как разрезать твою", 540, 1720, size=40, **DARK)
-    ep.pill(h1 + 0.5, tE, "Кубыш · бесплатно до следующей зарплаты", 540, 1820, size=36, **GREEN)
-    ep.dur = tE; ep.cover_t = 0.6
+    def view(t):
+        cv = pz.frame(state(t)).convert("RGB")
+        z, fx, fy, rot = cam(t)
+        if abs(rot) > 0.05: cv = cv.rotate(rot, resample=Image.BICUBIC, center=(CX, CY), fillcolor=TABLE)
+        if abs(z - 1) > 0.002:
+            w, h = W / z, H / z; x0 = min(max(0, fx - w / 2), W - w); y0 = min(max(0, fy - h / 2), H - h)
+            cv = cv.crop((int(x0), int(y0), int(x0 + w), int(y0 + h))).resize((W, H), Image.BILINEAR)
+        return cv
+
+    first = view(0.0)
+    def layer(img, t, cam_):
+        if d0 <= t < p0 or s8a <= t < loop0: return
+        if t >= loop0:  # петля: наплыв в первый кадр
+            cur = img.convert("RGB"); img.paste(Image.blend(cur, first, seg(t, loop0, loop0 + 0.8)).convert(img.mode), (0, 0)); return
+        img.paste(view(t).convert(img.mode), (0, 0))
+    ep.add(0, ep.dur, "screen", layer)
+
+    # Душная: переброска и три окна губ клипа S1b
+    ep.sfx(d0 - 0.05, "whoosh", 0.7); ep.sfx(p0 - 0.05, "whoosh", 0.7)
+    q1, q2 = b0 + 2.0, b0 + 3.7
+    ep.clip(d0, q1, R + "K02_клипы/S1b.mp4", "D1", src_t0=0.5)
+    ep.clip(q1, q2, R + "K02_клипы/S1b.mp4", "D2", src_t0=3.3)
+    ep.clip(q2, p0, R + "K02_клипы/S1b.mp4", "D3", src_t0=0.6)
+
+    # числа = голос
+    ep.pill(0.6, 1.7, "?", 540, 330, size=90, **DARK)
+    ep.pill(s3a + 1.4, s8a, "Обязательное · 30 000", 360, 300, size=40, **DARK)
+    ep.pill(s4a + 1.5, s8a, "Копилка · 40 000", 790, 1250, size=40, **GREEN)
+    ep.pill(s5a + 2.0, s7a, "16 дней до аванса", 540, 1330, size=46, **DARK)
+    ep.counter(s6a + 0.6, s7a, 0, 4250, 540, 430, size=120, color=MINT)
+    ep.sfx(s3a + 0.4, "swish", 0.4); ep.sfx(s4a + 1.5, "kaching", 0.5); ep.sfx(s5a + 0.3, "scribble", 0.5); ep.sfx(s6a + 0.5, "ding", 0.5)
+    for i, hh in enumerate(["10:00", "13:00", "16:00", "19:00", "21:00"]):  # таймлапс дня
+        ep.pill(s7a + 0.2 + i * 0.35, s7a + 0.55 + i * 0.35, hh, 540, 430, size=64, **DARK); ep.sfx(s7a + 0.2 + i * 0.35, "tick", 0.3)
+    ep.notif(s7a + 2.0, s8a, "Кубыш", "Потрачено 2 800 из 4 250", icon="К", color=(30, 130, 88))
+    ep.pill(s7a + 3.2, s8a, "Завтра 4 347", 540, 1330, size=56, bg=(200, 160, 30), fg=INK)
+    ep.pill(s7a + 3.6, s8a, "Экономия +1 450 — твоя", 540, 1440, size=46, **GREEN)
+
+    # склейка по форме: сегодняшний кусок → экран плана Ксюши
+    def bg(img, t, cam_): ImageDraw.Draw(img).rectangle([0, 0, W, H], fill=TABLE)
+    ep.add(s8a, cta0, "screen", bg)
+    ep.card(s8a, cta0, PLAN, keys=[(s8a, (0, 330, 1206, 2100), 540, 790, 820)], marks=[(s8a + 1.0, (60, 1330, 1150, 1700), MINT)])
+    ep.sfx(s8a, "boom", 0.4)
+
+    # призыв: Кубыш в кадре
+    ep.clip(cta0, loop0 + 1.0, R + "K03_клипы/C5.mp4", "C5", src_t0=0.6)
+    ep.pill(g0 + 0.3, loop0, "Напиши «план» — пришлю приложение", 540, 330, size=46, **DARK)
+    ep.pill(g0 + 2.5, loop0, "До следующей зарплаты — бесплатно", 540, 440, size=40, **GREEN)
+    ep.cover_t = 0.9
     return ep
