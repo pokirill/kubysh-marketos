@@ -11,18 +11,17 @@ R = "/Users/kirillpopov/Documents/Кубыш доки и артефакты /Р�
 F = "/Users/kirillpopov/Documents/Кубыш доки и артефакты /Рилсы маскот/V01_Зарплата_пицца/"
 VO = "/Users/kirillpopov/Documents/Кубыш доки и артефакты /Голоса/V_серия/"
 PLAN = R + "Запись_экрана/стартовый_план_ксюши.png"
-CX, CY, RAD = 540, 766, 462
+CX, CY, RAD = 545, 880, 470
 TOTAL, MUST, PIG, DAYS = 138000, 30000, 40000, 16
-PLATE, JAR = (122, 118), (940, 1368)
 GREEN = dict(bg=(30, 130, 88), fg=WHITE)
 DARK = dict(bg=(40, 34, 30), fg=WHITE)
-TABLE = (214, 200, 182)
+TABLE = (236, 222, 200)
 
 
 class Pizza:
     def __init__(self):
-        self.board = Image.open(F + "board.png").convert("RGBA").resize((W, H), Image.LANCZOS)
-        self.photo = Image.open(F + "pizza.png").convert("RGB").resize((W, H), Image.LANCZOS)
+        self.board = Image.open(F + "board_toon.png").convert("RGBA").resize((W, H), Image.LANCZOS)
+        self.photo = Image.open(F + "pizza_toon.png").convert("RGB").resize((W, H), Image.LANCZOS)
         am = 360 * MUST / TOTAL; ap = 360 * PIG / TOTAL
         self.must = self.wedge(-90, -90 + am)
         self.pig = self.wedge(-90 + am, -90 + am + ap)
@@ -54,20 +53,21 @@ class Pizza:
             col = Image.new("RGBA", img.size, ring + (255,)); col.putalpha(o); cv.alpha_composite(col, (ox, oy))
 
     def frame(self, s):
+        """Куски дней рисуются первыми, отрезанные куски — поверх пиццы и без уменьшения: поднимаются и уезжают к краю."""
         cv = self.board.copy()
-        m = eio(s["must"]); w = self.must
-        self.place(cv, w, (PLATE[0] - w["c"][0]) * m, (PLATE[1] - w["c"][1]) * m, lerp(1, 0.42, m), lift=math.sin(math.pi * m) + 0.2 * m)
-        p = eio(s["pig"]); w = self.pig
-        self.place(cv, w, (JAR[0] - w["c"][0]) * p, (JAR[1] - w["c"][1]) * p, lerp(1, 0.22, p), lift=math.sin(math.pi * p),
-                   alpha=1 - seg(s["pig"], 0.85, 1.0))
-        gap = 9 * eio(s["cut"])
         for i, w in enumerate(self.days):
-            dx, dy, k, lift, ring = w["dir"][0] * gap, w["dir"][1] * gap, 1.0, 0.0, None
+            g = eio(seg(s["cut"], i / DAYS * 0.8, i / DAYS * 0.8 + 0.25))  # куски расходятся по очереди
+            dx, dy, k, lift, ring = w["dir"][0] * 24 * g, w["dir"][1] * 24 * g, 1.0, 0.35 * g, None
             if i == 0 and s["today"] > 0:
                 tk = back(s["today"], 1.6); dx += w["dir"][0] * 120 * tk; dy += w["dir"][1] * 120 * tk; k = 1 + 0.14 * tk; lift = tk; ring = MINT
             if i == 1 and s["tomorrow"] > 0:
-                tk = back(s["tomorrow"], 1.6); dx += w["dir"][0] * 40 * tk; dy += w["dir"][1] * 40 * tk; k = 1 + 0.12 * tk; lift = 0.6 * tk; ring = YEL
+                tk = back(s["tomorrow"], 1.6); dx += w["dir"][0] * 60 * tk; dy += w["dir"][1] * 60 * tk; k = 1 + 0.12 * tk; lift = 0.7 * tk; ring = YEL
             self.place(cv, w, dx, dy, k, lift=lift, ring=ring)
+        for key, w in (("must", self.must), ("pig", self.pig)):
+            m = s[key]
+            if m <= 0: self.place(cv, w); continue
+            up = eout(seg(m, 0, 0.3)); go = eio(seg(m, 0.25, 1.0))
+            self.place(cv, w, w["dir"][0] * 330 * go, w["dir"][1] * 330 * go, 1 + 0.05 * up * (1 - go), lift=0.4 + up)
         return cv
 
 
@@ -91,7 +91,7 @@ def build():
         x0, x1 = ep.say("kubysh", "", cap=cap, at=t, file=VO + f"v3f_{i + 3}.wav", y=1560, size=68)
         c.append((x0, x1)); t = x1 + (0.3 if i != 3 else 0.7)
     (s3a, s3b), (s4a, s4b), (s5a, s5b), (s6a, s6b), (s7a, s7b) = c; s2a = p0
-    s8a = s7b + 0.3; s8b = s8a + 1.6  # экран плана: «Япония к апрелю» без голоса
+    s8a = s7b + 0.3; s8b = s8a + 3.4  # экран плана: «Япония к апрелю» без голоса
     cta0 = s8b + 0.2
     g0, g1 = ep.say("kubysh", "", cap="Напиши в комментариях слово «план» — пришлю приложение. До следующей зарплаты — бесплатно",
                     at=cta0 + 0.3, file=VO + "v3f_9.wav", y=1400, size=64)
@@ -132,18 +132,17 @@ def build():
 
     # Душная: переброска и три окна губ клипа S1b
     ep.sfx(d0 - 0.05, "whoosh", 0.7); ep.sfx(p0 - 0.05, "whoosh", 0.7)
-    q1, q2 = b0 + 2.0, b0 + 3.7
-    ep.clip(d0, q1, R + "K02_клипы/S1b.mp4", "D1", src_t0=0.5)
-    ep.clip(q1, q2, R + "K02_клипы/S1b.mp4", "D2", src_t0=3.3)
-    ep.clip(q2, p0, R + "K02_клипы/S1b.mp4", "D3", src_t0=0.6)
+    q1 = b0 + 2.0
+    ep.clip(d0, q1, R + "K02_клипы/S1b.mp4", "D1", src_t0=0.6)
+    ep.clip(q1, p0, R + "K02_клипы/S1b.mp4", "D2", src_t0=2.65, speed=0.75)
 
     # числа = голос
     ep.pill(0.6, 1.7, "?", 540, 330, size=90, **DARK)
-    ep.pill(s3a + 1.4, s8a, "Обязательное · 30 000", 360, 300, size=40, **DARK)
-    ep.pill(s4a + 1.5, s8a, "Копилка · 40 000", 790, 1250, size=40, **GREEN)
+    ep.pill(s3a + 1.4, s8a, "Обязательное · 30 000", 640, 230, size=44, **DARK)
+    ep.pill(s4a + 1.5, s8a, "Копилка · 40 000", 760, 1000, size=44, **GREEN)
     ep.pill(s5a + 2.0, s7a, "16 дней до аванса", 540, 1330, size=46, **DARK)
     ep.counter(s6a + 0.6, s7a, 0, 4250, 540, 430, size=120, color=MINT)
-    ep.sfx(s3a + 0.4, "swish", 0.4); ep.sfx(s4a + 1.5, "kaching", 0.5); ep.sfx(s5a + 0.3, "scribble", 0.5); ep.sfx(s6a + 0.5, "ding", 0.5)
+    ep.sfx(s3a + 0.4, "swish", 0.4); ep.sfx(s4a + 1.5, "kaching", 0.5); [ep.sfx(s5a + 0.3 + (i / DAYS * 0.8 + 0.1) * 1.9, "tick", 0.3) for i in range(DAYS)]; ep.sfx(s6a + 0.5, "ding", 0.5)
     for i, hh in enumerate(["10:00", "13:00", "16:00", "19:00", "21:00"]):  # таймлапс дня
         ep.pill(s7a + 0.2 + i * 0.35, s7a + 0.55 + i * 0.35, hh, 540, 430, size=64, **DARK); ep.sfx(s7a + 0.2 + i * 0.35, "tick", 0.3)
     ep.notif(s7a + 2.0, s8a, "Кубыш", "Потрачено 2 800 из 4 250", icon="К", color=(30, 130, 88))
@@ -153,7 +152,11 @@ def build():
     # склейка по форме: сегодняшний кусок → экран плана Ксюши
     def bg(img, t, cam_): ImageDraw.Draw(img).rectangle([0, 0, W, H], fill=TABLE)
     ep.add(s8a, cta0, "screen", bg)
-    ep.card(s8a, cta0, PLAN, keys=[(s8a, (0, 330, 1206, 2100), 540, 790, 820)], marks=[(s8a + 1.0, (60, 1330, 1150, 1700), MINT)])
+    ep.card(s8a, cta0, PLAN, keys=[(s8a, (0, 330, 1206, 2100), 540, 700, 760), (s8a + 0.9, (0, 1150, 1206, 1760), 540, 640, 1000)],
+            marks=[(s8a + 1.2, (60, 1330, 1150, 1700), MINT)])
+    ep.pill(s8a + 0.2, cta0, "У каждой цели — своя дата", 540, 230, size=50, **DARK)
+    for i, txt in enumerate(["Подушка — к декабрю", "Япония — к апрелю", "Алтай — к августу", "Новый айфон — к сентябрю"]):
+        ep.pill(s8a + 1.3 + i * 0.45, cta0, txt, 540, 1060 + i * 100, size=46, **GREEN); ep.sfx(s8a + 1.3 + i * 0.45, "pop", 0.4)
     ep.sfx(s8a, "boom", 0.4)
 
     # призыв: Кубыш в кадре
