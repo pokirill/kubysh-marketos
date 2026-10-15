@@ -56,3 +56,53 @@ App Store: https://apps.apple.com/app/id6778792103
 - Дзен: короткие версии сильных страниц (бюджет на месяц, 50/30/20, таблица с шаблоном) со ссылкой на оригинал на kubysh.com.
 - Rutube и VK Видео: рилсы с названием-запросом («Правило 50/30/20 на зарплату 80 000», «Как дожить до зарплаты») и
   ссылкой на соответствующую страницу в описании.
+
+## Проверка первоисточников 15.10.2026
+
+Каждую страницу скачал и прочитал сам (curl, без пересказа). Дата: `datePublished`/`dateModified` из разметки страницы.
+Почты только опубликованные на самом сайте, ничего не угадано. **Кубыш не упомянут ни в одной подборке.**
+
+### Исходные шесть
+
+| # | Издание | Ссылка | Автор | Канал связи (опубликован) | Дата | iPhone | Статус |
+|---|---|---|---|---|---|---|---|
+| 1 | Hi-Tech Mail | [Топ-5 приложений для учета финансов 2026](https://hi-tech.mail.ru/articles/145793-luchshie-prilozheniya-dlya-ucheta-finansov/) | Влад Сорокин, [профиль](https://hi-tech.mail.ru/authors/302-vlad-sorokin/) | общая почта редакции `ht_news@corp.mail.ru` со страницы [«Редакция»](https://hi-tech.mail.ru/editorial-staff/), там же личные адреса редакторов | 09.04.2026 | да, iOS и Android | готово к письму. В топе ДзенМани, CoinKeeper, Monefy, Cash Organizer, Wallet |
+| 2 | Нетология | [10 бесплатных приложений для учета финансов](https://netology.ru/blog/prilozheniya-dlya-uchota-finansov) | не проверен | не проверен | 21.05.2025 (по выдаче) | ? | **страница отдает 500/503**, повторить. Блог рекламный для курсов, приоритет низкий |
+| 3 | Банки.ру | статья «Лучшие приложения для финансового учета в 2026 году» | — | — | — | — | **не нашел**: ни поиском, ни по сайту. Есть только форум и новость старых лет. Нужна ссылка из выдачи Яндекса 05.10 |
+| 4 | СберСова | [Приложения для бюджета](https://sbersova.ru/sections/economy/top-10-prilozhenij-dlya-vedeniya-byudzheta) | не указан | `sbersova@sberbank.ru` со страницы [«О проекте»](https://sbersova.ru/o/about) | 11.08.2025 | да | готово к письму. Медиа банка, шанс ниже: в списке нет конкурентов Сбера, но и малых инди почти нет |
+| 5 | Т—Ж | [12 приложений, которые наведут порядок в финансах](https://t-j.ru/list/honey-money/) (с отзывами читателей) и [«Какие приложения вы используете для ведения бюджета?»](https://t-j.ru/prilojeniya-dlya-vedeniya-byudjeta-2025/) | редакция + комментарии читателей | форма «Написать в Т—Ж» в шапке (`/blank-form/`), [реклама](https://t-j.ru/advertising/); `support@t-j.ru` это поддержка, не редакция | 06.10.2023 и 20.02.2025 | да | статьи «23 приложения» не нашел, вероятно это одна из двух. **Лучший ход**: комментарий-опыт под второй (это сбор ответов читателей) + свой пост в сообществе |
+| 6 | Moscow Business Academy | [Приложения по учету финансов 2026](https://moscow.mba/journal/luchshie-prilozheniya-dlya-ucheta-rashodov-i-dohodov-v-2026-godu-polnyj-obzor) | «Moscow Business Academy» | `info@moscow.mba`, [контакты](https://moscow.mba/contact) | 06.02.2026 | да, раздел «Топ на iPhone и Android» | готово к письму |
+
+### Новые подборки
+
+| # | Издание | Ссылка | Автор | Канал связи | Дата | iPhone | Статус |
+|---|---|---|---|---|---|---|---|
+| 7 | vc.ru | [10 приложений для учета бюджета и финпланирования](https://vc.ru/id5781417/2819762-10-luchshikh-prilozheniy-dlya-uchyota-budzheta-i-finansovogo-planirovaniya) | Дмитрий Баканов, [профиль](https://vc.ru/id5781417) | комментарии открыты; личные сообщения в профиле vc.ru | 27.03.2026 | частично | **лучшая цель**: делит рынок на «трекеры прошлого» и «планировщики будущего», Кубыш ложится во второй класс. Первым у него свое (?) LFP, проверить |
+| 8 | vc.ru | [5 трекеров расходов для планирования бюджета в 2026](https://vc.ru/life/3027499-luchshie-prilozheniya-dlya-ucheta-lichnyh-finansov-5-trekerov-rashodov-dlya-planirovaniya-byudzheta-v-2026) | «Просто о финансах», [профиль](https://vc.ru/id5734757) | комментарии открыты | 14.07.2026 | да | первым идет Cupmoney, похоже на промо разработчика. Только комментарий с опытом |
+| 9 | vc.ru | [Учет личных финансов в 2026: гид по 5 приложениям](https://vc.ru/money/2980247-luchshie-prilozheniya-dlya-uchyota-lichnykh-finansov) | Redger, [профиль](https://vc.ru/id6006424) | комментарии открыты | 16.06.2026 | да | в списке TrackMoney, похоже на промо разработчика. Только комментарий |
+| 10 | КП | [Лучшие приложения для учета расходов и доходов 2026](https://www.kp.ru/expert/elektronika/luchshie-prilozheniya-dlya-ucheta-lichnykh-rashodov-i-dohodov/) | Виктория Щипанова, [профиль](https://www.kp.ru/expert/avtory/viktoriya-shhipanova/) | `expert@kp.ru` (опубликован на странице и в профиле) | обн. 27.05.2026 | да, отдельный топ | готово к письму. Обновляют ежегодно, высокий трафик |
+| 11 | Сравни | [10 iOS-приложений для контроля расходов](https://www.sravni.ru/text/10-ios-prilozhenij-dlya-kontrolya-rashodov/) | Арина Фанян | [контакты](https://www.sravni.ru/about/kontakty/), [реклама на Сравни](https://www.sravni.ru/about/reklama-na-sravni/); почты на странице нет | 22.04.2026 | **только iOS** | точное попадание по аудитории. Писать через форму контактов |
+| 12 | Финуслуги (Мосбиржа) | [7 приложений для контроля финансов](https://finuslugi.ru/navigator/nakopit-i-sohranit/stat_top_8_prilozhenij_dlya_lichnyh_finansov) | Орнелла Насыпова, [профиль](https://finuslugi.ru/navigator/author/ornella_nasypova) | `editors@finuslugi.ru` (на странице автора) | 30.10.2025 | да | готово к письму |
+| 13 | Лайфхакер | [10 приложений для учета личных финансов 2025](https://lifehacker.ru/10-money-management-apps/) | не указан в разметке | `ask@lifehacker.ru` со страницы [«О нас»](https://lifehacker.ru/about/) | обн. 02.04.2025 | да | обновляют раз в год, к апрелю 2027. Письмо сейчас |
+| 14 | Unisender (блог) | [Лучшие приложения для личного финансового учета](https://www.unisender.com/ru/blog/poleznye-prilozheniya-dlya-vedeniya-byudzheta/) | Натали Азаренко, [профиль](https://www.unisender.com/ru/blog/author/n-azarenko/), ТГ [@NataliAzarenko](https://t.me/NataliAzarenko) из профиля | ТГ автора | 14.05.2025 | да | низкий приоритет: аудитория маркетологи |
+| 15 | Bankiros | [15 приложений для учета расходов](https://bankiros.ru/wiki/term/top-prilozheniyi-dlya-kontrolya-rashodov) | Редакция Bankiros | `pr@bankiros.ru`, `info@bankiros.ru` со страницы [контактов](https://bankiros.ru/contacts) | не указана | да | готово к письму на pr@ |
+| 16 | Блог Совкомбанка | [Лучшие приложения для ведения бюджета](https://journal.sovcombank.ru/sberezheniya/luchshie-prilozheniya-dlya-vedeniya-byudzheta) | Анна Молчанова, [профиль](https://journal.sovcombank.ru/authors/anna-molchanova) | `blog@sovcombank.ru` со страницы [контактов](https://journal.sovcombank.ru/about/contacts) | обн. 10.06.2025 | мало | средний приоритет |
+| 17 | Tproger | [Топ-20 приложений по финансам 2025](https://tproger.ru/articles/top-20-prilozhenij-po-finansam-v-2025-godu) | «Путеводная звезда» | `editorial@tproger.ru` (на странице) | 06.09.2025 | да | аудитория разработчики; скорее для статьи про AI-разработку, чем для включения |
+| 18 | Газпромбанк | [10 приложений для учета личных финансов](https://www.gazprombank.ru/pro-finance/lifestyle/prilozheniya-dlya-ucheta-finansov/) | Редакция | почты нет | обн. 25.10.2024 | мало | пропустить |
+| 19 | iChip | [7 приложений для учета расходов](https://ichip.ru/podborki/programmy-prilozheniya/prilozheniya-dlya-ucheta-rashodov-i-dohodov-i-planirovaniya-byudzheta-829592) | Анастасия Комкова | [редакция](https://ichip.ru/editorial-office) | 24.05.2023 | да | устарела, пропустить |
+| 20 | Rb.ru | [Сервисы для финучета и планирования](https://rb.ru/stories/finuchet-planirovanie/) | Елена Лиханова | `team@rb.ru` | 19.07.2024 | мало | устарела, пропустить |
+| 21 | Пикабу | [ТОП-6 приложений для контроля бюджета](https://pikabu.ru/story/top6_prilozheniy_dlya_kontrolya_byudzheta_10308809) | аккаунт удален | — | 08.06.2023 | — | мертвая. На Пикабу свежих подборок не нашел: вместо письма свой пост в тег «Учет расходов» |
+
+### Дзен
+
+Поиском (US-индекс) свежих подборок на dzen.ru не нашел ни одной: Дзен плохо индексируется вне Яндекса. Искать нужно в
+самом Яндексе или в поиске Дзена, это лучше сделать через браузер Кирилла. Альтернатива: своя подборка (черновик
+`Docs/publications/62_Listicle_iPhone_budget_apps_2026_DRAFT.md`).
+
+### Порядок действий (предлагаю)
+
+1. Письма: КП (`expert@kp.ru`), Hi-Tech Mail, Финуслуги, Moscow Business Academy, Bankiros, Лайфхакер. Шаблон выше, первую строку под статью.
+2. Формы: Сравни (единственная iOS-only подборка), Т—Ж.
+3. Комментарии с опытом (не реклама): vc.ru №7 (Баканов) первым, затем №8, №9; Т—Ж «Какие приложения вы используете».
+4. Своя подборка в Дзене и на vc.ru.
+5. Проверить в шаблоне строку «5,0 в App Store»: верно на 15.10 (15 оценок), перед отправкой сверить снова.
