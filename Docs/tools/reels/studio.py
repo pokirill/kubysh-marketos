@@ -683,8 +683,100 @@ class Ep:
             from PIL import ImageFilter as _F
             cv.paste(sh.filter(_F.GaussianBlur(22)), (int(cx - f.width / 2 - 40), int(cy - f.height / 2 - 40)), sh.filter(_F.GaussianBlur(22)))
             cv.paste(f, (int(cx - f.width / 2), int(cy - f.height / 2)), m)
+            zs = [zz for zz in c.get("zoom", ()) if t >= zz[0]]   # наезд на блок экрана: (t0, t1, z от, z до, y фокуса)
+            if zs:
+                    z0t, z1t, za, zb, fy = zs[-1]
+                    z = lerp(za, zb, eio(seg(t, z0t, z1t))); w, h = W / z, H / z; y0 = min(max(0, fy - h / 2), H - h)
+                    cv = cv.crop((int((W - w) / 2), int(y0), int((W + w) / 2), int(y0 + h))).resize((W, H), Image.BILINEAR)
             return cv
         return f
+
+    # ---------- хук-итог и прогресс-бар (правила рилса v5, 19.10) ----------
+    def hook_result(self, t, text=None, sub=None, hold=1.3, rew=0.6):
+        """Первые hold с — кадр итога (момент t сюжета) с медленным наездом и подписью, затем rew с перемотки назад,
+        дальше сюжет с начала. Сюжет при сборке рендерится вторым проходом из свежего build() (load ставит _factory)."""
+        self.hook = dict(t=t, text=text, sub=sub, hold=hold, rew=rew)
+
+    def hook_clip(self, t0, t1, rew=0.6, text=None):
+        """Холодное открытие: первые секунды — кусок сюжета [t0, t1) со своим голосом и субтитрами (самый яркий момент,
+        обычно итог), затем rew с перемотки назад, дальше сюжет с начала (19.10: перевыпуски без новых голосов)."""
+        self.hook = dict(mode="clip", t0=t0, t1=t1, rew=rew, text=text, sub=None, hold=t1 - t0)
+
+    def _hook_frames(self):
+        h = self.hook
+        if h.get("mode") == "clip":   # кадры храним в JPEG: 3–5 с кадров 1080×1920 без сжатия — это гигабайт памяти
+            import io
+            n = max(2, int(h["rew"] * FPS)); a, b = int(h["t0"] * FPS), int(h["t1"] * FPS)
+            idx = [int(h["t1"] * (1 - (k + 1) / n) * FPS) for k in range(n)]
+            need = set(range(a, b)) | set(idx); store = {}; dt = 1 / FPS
+            for i in range(max(need) + 1):
+                t = i * dt; cam = self.cam.state(t)
+                for x in self.order: x.update(t, dt, self.order, cam)
+                if i in need:
+                    buf = io.BytesIO(); self.frame(t).convert("RGB").save(buf, "JPEG", quality=92); store[i] = buf.getvalue()
+            return dict(clip=[store[i] for i in range(a, b)], rew=[store[i] for i in idx])
+        n = max(2, int(h["rew"] * FPS)); i_res = int(h["t"] * FPS)
+        idx = [int(h["t"] * (1 - (k + 1) / n) * FPS) for k in range(n)]
+        want = {i: None for i in [i_res] + idx}; dt = 1 / FPS
+        caps, self.caps = self.caps, []   # в кадре итога без субтитров сюжета: текст хука свой
+        for i in range(max(want) + 1):
+            t = i * dt; cam = self.cam.state(t)
+            for a in self.order: a.update(t, dt, self.order, cam)
+            if i in want: want[i] = self.frame(t)
+        self.caps = caps
+        return [want[i_res]] + [want[i] for i in idx]
+
+    def _text_block(self, img, text, y, size, fill=WHITE, k=1.0):
+        lines, cur = [], []
+        for w in text.split(" "):
+            if cur and sum(word_img(x, size, fill).width for x in cur + [w]) + size * 0.28 * len(cur) > 960: lines.append(cur); cur = []
+            cur.append(w)
+        lines.append(cur)
+        for li, ln in enumerate(lines):
+            ims = [word_img(x, size, fill) for x in ln]; sp = int(size * 0.28)
+            x = (W - sum(i.width for i in ims) - sp * (len(ims) - 1)) / 2
+            for im in ims:
+                s = scaled(im, max(0.05, k)); comp(img, s, x + (im.width - s.width) / 2, y + li * int(size * 1.2) + (im.height - s.height) / 2)
+                x += im.width + sp
+        return y + len(lines) * int(size * 1.2)
+
+    def _jpg(self, b):
+        import io
+        return Image.open(io.BytesIO(b)).convert("RGBA")
+
+    def _prelude(self, frames, i):
+        h = self.hook
+        if isinstance(frames, dict):
+            if i < len(frames["clip"]):
+                im = self._jpg(frames["clip"][i])
+                if h.get("text"): self._text_block(im, h["text"], 250, 96, YEL, back(seg(i / FPS, 0.1, 0.4), 1.8))
+                return im
+            r = frames["rew"]; return self._rewind_fx(self._jpg(r[min(len(r) - 1, i - len(frames["clip"]))]), i)
+        hold = int(h["hold"] * FPS)
+        if i < hold:
+            z = 1 + 0.07 * i / hold; w, hh = W / z, H / z
+            im = frames[0].crop((int((W - w) / 2), int((H - hh) / 2), int((W + w) / 2), int((H + hh) / 2))).resize((W, H), Image.BILINEAR)
+            k = back(seg(i / FPS, 0.05, 0.35), 1.8); y = self.hook.get("y", 520)
+            if h["text"]: y = self._text_block(im, h["text"], y, 104, YEL, k)
+            if h["sub"]: self._text_block(im, h["sub"], y + 10, 76, WHITE, back(seg(i / FPS, 0.35, 0.65), 1.8))
+            return im
+        return self._rewind_fx(frames[1 + min(len(frames) - 2, i - hold)].copy(), i)
+
+    def _rewind_fx(self, im, i):
+        rnd = random.Random(i)
+        for _ in range(6):   # полосы перемотки, как на кассете
+            y = rnd.randrange(0, H - 40); band = im.crop((0, y, W, y + rnd.randrange(8, 40)))
+            im.paste(band, (rnd.choice([-1, 1]) * rnd.randrange(20, 70), y))
+        im = Image.blend(im, Image.new("RGBA", im.size, (20, 20, 40, 255)), 0.28)
+        d = ImageDraw.Draw(im); cx, cy = 540, 960
+        for dx in (-70, 10):
+            d.polygon([(cx + dx + 60, cy - 55), (cx + dx + 60, cy + 55), (cx + dx - 10, cy)], fill=(255, 255, 255, 235))
+        return im
+
+    def _bar(self, img, T, total):
+        d = ImageDraw.Draw(img); x1 = int(40 + (W - 80) * clamp(T / total))
+        d.rounded_rectangle([40, 26, W - 40, 38], radius=6, fill=(0, 0, 0, 110))
+        if x1 > 46: d.rounded_rectangle([40, 26, x1, 38], radius=6, fill=MINT + (255,))
 
     # ---------- кадр ----------
     def background(self, t, cam):
@@ -749,29 +841,46 @@ class Ep:
 
     def render(self, preview=None):
         out_dir = os.path.join(OUT_KSY if self.name.startswith("K") else OUT_ROOT, self.name); os.makedirs(out_dir, exist_ok=True)
-        N = int(self.dur * FPS); dt = 1 / FPS
+        story, H0, pre = self, 0.0, []
+        if getattr(self, "hook", None):   # итог первым кадром: кадры итога из первого прохода, сюжет — из свежего build()
+            pre = self._hook_frames(); story = self._factory()
+            H0 = ((len(pre["clip"]) + len(pre["rew"])) if isinstance(pre, dict) else int(self.hook["hold"] * FPS) + len(pre) - 1) / FPS
+        NP = int(round(H0 * FPS)); total = H0 + story.dur; N = NP + int(story.dur * FPS); dt = 1 / FPS
+        bar = getattr(self, "progress", True)
         enc = None
         if preview is None:
             silent = os.path.join(out_dir, "_video.mp4")
             enc = subprocess.Popen([ENC, silent, str(W), str(H), str(FPS)], stdin=subprocess.PIPE)
         want = sorted(int(p * FPS) for p in (preview or []))
-        cover = int(self.cover_t * FPS)
+        cover = int(0.5 * FPS) if pre else int(self.cover_t * FPS)
         for i in range(N):
-            t = i * dt; cam = self.cam.state(t)
-            for a in self.order: a.update(t, dt, self.order, cam)
-            if enc is None and i not in want: continue
-            img = self.frame(t)
+            if i < NP:
+                if enc is None and i not in want: continue
+                img = self._prelude(pre, i)
+            else:
+                t = (i - NP) * dt; cam = story.cam.state(t)
+                for a in story.order: a.update(t, dt, story.order, cam)
+                if enc is None and i not in want: continue
+                img = story.frame(t)
+            if bar: self._bar(img, i * dt, total)
             if enc is not None:
                 enc.stdin.write(img.tobytes("raw", "BGRA"))
                 if i == cover: img.convert("RGB").save(os.path.join(out_dir, "Обложка.png"))
             else:
-                img.convert("RGB").save(os.path.join(out_dir, f"_preview_{t:05.2f}.png"))
+                img.convert("RGB").save(os.path.join(out_dir, f"_preview_{i * dt:05.2f}.png"))
             if preview is not None and i >= want[-1]: break
         if enc is None: return out_dir
         enc.stdin.close(); enc.wait()
         soft = {"tick": 0.5, "pop": 0.6, "msg": 0.6, "ding": 0.6, "marker": 0.5, "clink": 0.6, "swish": 0.5, "hop": 0.6, "whoosh": 0.7}
-        ev = [(t, smp, getattr(self, "vgain", 1.0)) for t, smp in self.voice] + list(getattr(self, "extra", [])) + [(t, audio.sfx(n), g * soft.get(n, 1.0) * getattr(self, "sfxgain", 1.0)) for t, n, g in self.sfx_ev]
-        wav = os.path.join(out_dir, "_mix.wav"); audio.mix(ev, self.dur, wav)
+        s = story
+        ev = [(t + H0, smp, getattr(s, "vgain", 1.0)) for t, smp in s.voice] + [(t + H0, smp, g) for t, smp, g in getattr(s, "extra", [])] + [(t + H0, audio.sfx(n), g * soft.get(n, 1.0) * getattr(s, "sfxgain", 1.0)) for t, n, g in s.sfx_ev]
+        if isinstance(pre, dict):   # звук холодного открытия — голоса и звуки самого куска сюжета
+            a, b = self.hook["t0"], self.hook["t1"]
+            ev += [(t - a, smp, getattr(self, "vgain", 1.0)) for t, smp in self.voice if a - 0.05 <= t < b]
+            ev += [(t - a, audio.sfx(n), g * soft.get(n, 1.0) * getattr(self, "sfxgain", 1.0)) for t, n, g in self.sfx_ev if a <= t < b]
+            ev += [(b - a - 0.05, audio.sfx("whoosh"), 0.5)]
+        elif pre: ev += [(0.03, audio.sfx("boom"), 0.35), (self.hook["hold"] - 0.05, audio.sfx("whoosh"), 0.5)]
+        wav = os.path.join(out_dir, "_mix.wav"); audio.mix(ev, total, wav)
         label = {"yandex": "Яндекс", "edge": "Edge"}.get(getattr(self, "cast", ""), "")
         final = os.path.join(out_dir, f"{self.name}{'_' + label if label else ''}.mp4"); audio.mux(silent, wav, final)
         for f in ("_video.mp4", "_mix.wav", "_mix.m4a"):
@@ -784,7 +893,11 @@ def load(path, cast="yandex"):
     """cast: yandex (SpeechKit) | edge (бесплатные многоязычные). Голоса синтезируются при сборке сценария."""
     audio.CAST = audio.CASTS[cast]
     spec = importlib.util.spec_from_file_location("ep", path); m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
-    ep = m.build(); ep.cast = cast; return ep
+    ep = m.build(); ep.cast = cast
+    def _fresh():
+        e = m.build(); e.cast = cast; return e
+    ep._factory = _fresh
+    return ep
 
 
 if __name__ == "__main__":
