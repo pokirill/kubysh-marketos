@@ -101,7 +101,7 @@
 |---|---|---|---|---|
 | @yazydzhi | | | | |
 | @lena_kazmina | | | | |
-| @dillihell | | | | |
+| @dillihell | 19.10 09:24 | 19.10 11:20: готова ответить текстом, случай был один, «ощущалось болезненно» | 19.10 12:32, текстом | `research/custdev/2026-10_dillihell.md` |
 | @zhusnik | | | | |
 | @annavosh25 | | | | |
-| @marywonderful | | | | |
+| @marywonderful | | | 19.10, созвон | `research/custdev/2026-10_marywonderful.md` |
