@@ -85,7 +85,6 @@ def make(c):
     end = e1 + 1.8
     icon(ep, e0, end, y=820, size=230)
     ep.pill(e0 + 0.1, end, "Кубыш · приложение для денег на iPhone", 540, 300, size=42, **STY["dark"])
-    ep.pill(e1 - 0.2, end, "Напиши «план» — пришлю ссылку", 540, 1080, size=48, **STY["green"])
     ep.pill(e1 + 0.3, end, "Бюджет под твою жизнь, а не наоборот", 540, 1190, size=40, **STY["dark"])
     if c.get("kub_cta"): ep.clip(r0 - 0.1, end, c["kub_cta"], "kub2", speed=min(1.0, 4.9 / (end - r0 + 0.1)))
     else: ep.clip(r0 - 0.1, end, KUB, "kub2", src_t0=4.95, speed=-min(1.0, 4.9 / (end - r0 + 0.1)))   # тот же Кубыш задом наперед: без повтора кадров
