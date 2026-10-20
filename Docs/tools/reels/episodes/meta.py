@@ -196,3 +196,91 @@ def envelopes(ep, t0, t1, mode, split_t=None):
                 w, h = 860 * k, 330 * k; x = W / 2 - w / 2; y = 380 + i * 400
                 env(d, x, y, w, h, lab, col, closed=(mode == "done"), check=(mode == "done"))
     ep.add(t0, t1, "screen", fn)
+
+
+def bucket(ep, t0, t1, first_t=None):
+    """Дырявое ведро: зарплата льется водой и утекает через дырки «такси», «доставка», «маркетплейс».
+    С first_t: сначала монеты в банку «Накопления», остаток — в ведро."""
+    holes = [("такси", 0.25), ("доставка", 0.5), ("маркетплейс", 0.75)]
+    def fn(img, t, cam):
+        d = _bg(img, (40, 52, 70), (18, 24, 34))
+        bx, by, bw, bh = 260, 820, 560, 620
+        d.polygon([(bx, by), (bx + bw, by), (bx + bw - 70, by + bh), (bx + 70, by + bh)], fill=(150, 160, 175), outline=(90, 100, 115))
+        lvl = 0.55 + 0.1 * math.sin(t * 2) if first_t is None or t < first_t else 0.35
+        wy = by + bh * (1 - lvl)
+        d.polygon([(bx + 70 * (1 - lvl) + 8, wy), (bx + bw - 70 * (1 - lvl) - 8, wy), (bx + bw - 78, by + bh - 6), (bx + 78, by + bh - 6)], fill=(80, 160, 230))
+        for x in range(int(bx + 200), int(bx + 360), 8):  # струя сверху
+            d.line([x, 380, x + 20 * math.sin(t * 6 + x), wy], fill=(110, 180, 240), width=6)
+        d.text((W / 2, 330), "Зарплата", font=P.font(64), fill=WHITE, anchor="mm")
+        for lab, k in holes:
+            hx, hy = bx + bw - 70 * k + 4, by + bh * k
+            for j in range(5):
+                ph = (t * 3 + j * 0.2) % 1
+                d.ellipse([hx + 40 + 180 * ph - 9, hy + 260 * ph * ph - 9, hx + 40 + 180 * ph + 9, hy + 260 * ph * ph + 9], fill=(110, 180, 240))
+            d.text((hx + 70, hy - 40), lab, font=P.font(40, "Medium"), fill=(255, 140, 140))
+        if first_t is not None and t >= first_t:  # банка накоплений слева
+            k = eout(seg(t, first_t, first_t + 0.5)); jx, jy = 90, 520
+            d.rounded_rectangle([jx, jy, jx + 230, jy + 380], radius=40, outline=(220, 240, 230), width=8)
+            f = min(1, seg(t, first_t + 0.3, t1 - 0.5))
+            if f > 0.01: d.rectangle([jx + 12, jy + 368 - 340 * f, jx + 218, jy + 368], fill=(255, 200, 60))
+            d.text((jx + 115, jy - 50), "Накопления", font=P.font(40, "SemiBold"), fill=(140, 240, 180), anchor="mm")
+    ep.add(t0, t1, "screen", fn)
+
+
+def jar_counter(ep, t0, t1, value=81500, label="каждый месяц"):
+    """Итог Б1: полная банка и счетчик «+81 500 каждый месяц»."""
+    def fn(img, t, cam):
+        d = _bg(img, (18, 50, 38), (8, 24, 18))
+        jx, jy = W / 2 - 220, 640
+        d.rounded_rectangle([jx, jy, jx + 440, jy + 640], radius=70, outline=(230, 245, 235), width=12)
+        d.rectangle([jx + 22, jy + 120, jx + 418, jy + 620], fill=(255, 200, 60))
+        v = int(value * eout(seg(t, t0 + 0.1, t0 + 1.2)) / 100) * 100
+        s = word_img("+" + f"{v:,}".replace(",", " ") + " ₽", 120, fill=(255, 214, 74)); comp(img, s, W / 2 - s.width / 2, 300)
+        s2 = word_img(label, 70, fill=WHITE); comp(img, s2, W / 2 - s2.width / 2, 470)
+    ep.add(t0, t1, "screen", fn)
+
+
+def odometer(ep, t0, t1, value=116992):
+    """Обычное приложение — одометр: барабаны крутят «Потрачено 116 992», серые столбики прошлого."""
+    def fn(img, t, cam):
+        d = _bg(img, (34, 34, 38), (14, 14, 16))
+        d.text((W / 2, 420), "Потрачено", font=P.font(64, "Medium"), fill=(170, 170, 180), anchor="mm")
+        v = int(value * eout(seg(t, t0, t0 + 2.0))); s = f"{v:06d}"
+        for i, ch in enumerate(s):
+            x = 150 + i * 135
+            d.rounded_rectangle([x, 520, x + 120, 700], radius=14, fill=(20, 20, 22), outline=(90, 90, 96), width=4)
+            d.text((x + 60, 610), ch, font=P.font(110), fill=WHITE, anchor="mm")
+        for i, h in enumerate([220, 340, 180, 300, 260, 380]):
+            d.rectangle([180 + i * 125, 1350 - h, 260 + i * 125, 1350], fill=(110, 110, 118))
+        d.text((W / 2, 1420), "и что с этим делать?", font=P.font(52, "Medium"), fill=(150, 150, 160), anchor="mm")
+    ep.add(t0, t1, "screen", fn)
+
+
+def navigator(ep, t0, t1, eta="Япония · 10.08.2027"):
+    """Кубыш — навигатор: дорога к цели, точка едет, время прибытия — прогнозная дата цели."""
+    def fn(img, t, cam):
+        d = _bg(img, (230, 236, 228), (206, 214, 204))
+        pts = [(200, 1650), (300, 1350), (650, 1200), (520, 900), (800, 700), (700, 420)]
+        d.line(pts, fill=(255, 255, 255), width=70, joint="curve"); d.line(pts, fill=(60, 170, 110), width=30, joint="curve")
+        k = eio(seg(t, t0 + 0.2, t1 - 0.6)); n = len(pts) - 1; i = min(int(k * n), n - 1); f = k * n - i
+        x, y = lerp(pts[i][0], pts[i + 1][0], f), lerp(pts[i][1], pts[i + 1][1], f)
+        d.ellipse([x - 34, y - 34, x + 34, y + 34], fill=(40, 120, 230), outline=WHITE, width=8)
+        d.ellipse([680, 370, 740, 430], fill=(230, 70, 70))
+        d.rounded_rectangle([90, 120, W - 90, 300], radius=40, fill=(255, 255, 255))
+        d.text((W / 2, 170), "Прибытие к цели", font=P.font(40, "Medium"), fill=(110, 120, 115), anchor="mm")
+        d.text((W / 2, 245), eta, font=P.font(60), fill=(30, 110, 70), anchor="mm")
+    ep.add(t0, t1, "screen", fn)
+
+
+def analytics_then_nav(ep, t0, t1, card="/Users/kirillpopov/Documents/Кубыш доки и артефакты /Скриншоты 1.7/Карточки для стора 1.7 (сборка 100)/07_Куда_уходят_деньги.png"):
+    """С1: сначала аналитика «куда ушли» (карточка 07, телефон крупно), затем навигатор к цели."""
+    mid = t0 + (t1 - t0) * 0.45
+    im = Image.open(card).convert("RGB")
+    ph = im.crop((90, 700, 1200, 2796)).resize((760, int(760 * 2096 / 1110))).convert("RGBA")
+    def fn(img, t, cam):
+        d = _bg(img, (238, 242, 238), (214, 222, 214))
+        k = back(seg(t, t0, t0 + 0.4), 1.4); s = scaled(ph, k * lerp(1.0, 1.08, seg(t, t0, mid)))
+        comp(img, s, W / 2 - s.width / 2, 260)
+        d.rounded_rectangle([170, 120, W - 170, 220], radius=50, fill=(40, 52, 46)); d.text((W / 2, 170), "Куда ушли деньги", font=P.font(52), fill=WHITE, anchor="mm")
+    ep.add(t0, mid, "screen", fn)
+    navigator(ep, mid, t1)

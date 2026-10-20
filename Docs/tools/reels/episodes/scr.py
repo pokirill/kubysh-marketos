@@ -16,7 +16,7 @@ PH = (900, 540, 960, BG)
 STY = {"dark": dict(bg=(24, 40, 34), fg=WHITE), "green": dict(bg=(30, 130, 88), fg=WHITE),
        "yellow": dict(bg=(255, 214, 74), fg=INK), "red": dict(bg=(170, 48, 60), fg=WHITE)}
 INTRO = "Я Кубыш. Считаю, хватит ли денег до зарплаты"   # в Т1, Т2, Б3 (согласованы 20.10)
-INTRO_V2 = ("Я Кубыш, помогу комфортно накопить на подушку и цели", "t_01v2_intro")   # Кирилл 20.10: для всех следующих роликов
+INTRO_V2 = ("Я Кубыш, помогу разобраться в финансах и комфортно накопить на подушку и цели", "t_01v2_intro")   # Кирилл 20.10: для всех следующих роликов
 CTA = {"A": ("Скачай Кубыш бесплатно в Эп Стор", "Скачай Кубыш *бесплатно* в App Store"),
        "B": ("Посчитай свой план за три минуты", "Посчитай свой план за *3 минуты*")}
 Y = 1560
@@ -35,7 +35,8 @@ def make(c):
     ep.avatars = {"kubysh": Image.open(RK + "Референсы/avatar_kubysh.png").convert("RGBA")}
 
     # 1–2 · Кубыш представляется и называет проблему (клип C5, замедленный под длину реплик)
-    a0, a1 = ep.say("kubysh", INTRO, y=Y, size=64, at=0.1, file=VO + "t_01_intro_f_48k.wav")
+    it, iv = (INTRO_V2[0], INTRO_V2[1] + "_f_48k.wav") if c.get("intro_v2") else (INTRO, "t_01_intro_f_48k.wav")
+    a0, a1 = ep.say("kubysh", it, y=Y, size=60, at=0.1, file=VO + iv)
     t = a1 + 0.12
     tp = t
     for k_, (line, pills) in enumerate(c["problem"]):
@@ -54,7 +55,8 @@ def make(c):
         if s_.get("clip"): ep.clip(t, i1 + 0.3, s_["clip"], "insert", src_t0=s_.get("src", 0.0))
         if s_.get("fn"):  # метафора кодом, затем (rec) запись экрана в рамке телефона
             mid = t + (i1 + 0.3 - t) * s_.get("split", 1.0); s_["fn"](ep, t, mid)
-            if s_.get("rec"): ep.clip(mid, i1 + 0.3, REC + s_["rec"], "insrec", src_t0=s_.get("src", 0.0), phone=PH)
+            if s_.get("pill"): ep.pill(mid + (i1 + 0.3 - mid) * s_["pill"][1], i1 + 0.3, s_["pill"][0], 540, 1820, size=48, **STY["green"])
+            if s_.get("rec"): ep.clip(mid, i1 + 0.3, s_["rec"] if s_["rec"].startswith("/") else REC + s_["rec"], "insrec", src_t0=s_.get("src", 0.0), phone=PH)
         ep.sfx(t + 0.2, "swish", 0.5)
         t = i1 + 0.3
 
@@ -62,7 +64,7 @@ def make(c):
     for k_, s in enumerate(c["screen"]):
         d0, d1 = ep.say("kubysh", s["say"], cap=s.get("cap"), y=1720, size=58, at=t + 0.1, file=vo(c, f"screen{k_}"))
         dur = max(d1 + 0.25 - t, s.get("min", 0.0))
-        ep.clip(t, t + dur, REC + s["rec"], s["rec"], src_t0=s["src"], speed=s.get("speed", 1.0), phone=PH)
+        ep.clip(t, t + dur, s["rec"] if s["rec"].startswith("/") else REC + s["rec"], s["rec"], src_t0=s["src"], speed=s.get("speed", 1.0), phone=PH)
         ep.clips[-1]["zoom"] = [(t + a, t + b, za, zb, fy) for a, b, za, zb, fy in s.get("zoom", ())]
         for a, b, text, y, st in s.get("pills", ()):
             ep.pill(t + a, t + b, text, 540, y, size=52, **STY[st]); ep.sfx(t + a, "pop", 0.5)
