@@ -12,11 +12,11 @@ Y = 1560
 
 def make(name, segs, cta, hook_text, hook_y=250, kub_cta=PHONE):
     ep = Ep(f"{name}_{cta}", "studio"); ep.sfxgain = 0.4
-    ep.avatars = {w: Image.open(RK + f"Референсы/avatar_{w}.png").convert("RGBA") for w in ("ksy", "kubysh", "dush")}
+    ep.avatars = {w: Image.open(RK + f"Референсы/avatar_{w}.png").convert("RGBA") for w in ("ksy", "kubysh", "dush", "friend")}
     t, hk = 0.1, None
     for s in segs:
         a0, a1 = ep.say(s["who"], "", cap=s["cap"], y=Y, size=s.get("size", 60), at=t, file=VO + s["vo"] + "_f_48k.wav")
-        end = a1 + s.get("tail", 0.2); vis = s["vis"]; sh = s.get("share") or [1 / len(vis)] * len(vis)
+        end = a1 + s.get("tail", 0.2); vis = s["vis"]; sh = s.get("share") or [1 / max(1, len(vis))] * len(vis)
         x0 = max(0.0, t - 0.1); x = x0; acc = 0.0
         for i, (v, k) in enumerate(zip(vis, sh)):
             path, src, sp = v[:3]; acc += k
@@ -32,5 +32,5 @@ def make(name, segs, cta, hook_text, hook_y=250, kub_cta=PHONE):
     icon(ep, e0, end, y=820, size=230)
     ep.clip(t - 0.05, end, kub_cta, "kub_cta", speed=min(1.0, 4.9 / (end - t)))
     ep.dur = end
-    ep.hook_clip(*hk, text=hook_text); ep.hook["y"] = hook_y
+    if hk: ep.hook_clip(*hk, text=hook_text); ep.hook["y"] = hook_y
     return ep

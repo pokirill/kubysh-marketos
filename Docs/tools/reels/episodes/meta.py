@@ -354,3 +354,36 @@ def fork(ep, t0, t1, value=2000):
         d.ellipse([cx - 110, cy - 110, cx + 110, cy + 110], fill=(255, 200, 60), outline=(200, 140, 30), width=10)
         d.text((cx, cy), f"{value:,}".replace(",", " "), font=P.font(64), fill=(90, 60, 10), anchor="mm")
     ep.add(t0, t1, "screen", fn)
+
+
+def broken_excel(ep, t0, t1, mode="broken", shift_t=None):
+    """Т3: таблица бюджета. ok — формулы считают; shift_t — строка сдвигается и по столбцу «Остаток» бегут «#ЗНАЧ!»;
+    broken — все итоги в «#ЗНАЧ!», курсор мечется по ячейкам."""
+    rows = [("Зарплата", "150 000"), ("Аренда", "45 000"), ("Кредит", "12 000"), ("Еда", "18 400"), ("Такси", "4 300"), ("Кафе", "6 900"), ("Подписки", "1 900")]
+    def fn(img, t, cam):
+        d = _bg(img, (226, 230, 234), (190, 196, 202))
+        lx, ly, lw, lh = 50, 380, W - 100, 1000
+        d.rounded_rectangle([lx, ly, lx + lw, ly + lh], radius=30, fill=(40, 42, 46))
+        sx, sy, sw, sh = lx + 22, ly + 22, lw - 44, lh - 60
+        d.rectangle([sx, sy, sx + sw, sy + sh], fill=WHITE); d.rectangle([sx, sy, sx + sw, sy + 70], fill=(33, 115, 70))
+        d.text((sx + 24, sy + 35), "Бюджет.xlsx", font=P.font(34, "SemiBold"), fill=WHITE, anchor="lm")
+        d.rectangle([sx, sy + 70, sx + sw, sy + 130], fill=(240, 242, 244))
+        d.text((sx + 24, sy + 100), "fx  =C4-SUM(D5:D11)/ДНИ", font=P.font(30, "Medium"), fill=(90, 90, 100), anchor="lm")
+        k = 1.0 if mode == "broken" else (seg(t, shift_t, shift_t + 1.2) if shift_t else 0.0)
+        off = 70 * eout(seg(t, shift_t, shift_t + 0.3)) if shift_t and mode != "broken" else (70 if mode == "broken" else 0)
+        for i, (a, b) in enumerate(rows):
+            y = sy + 150 + i * 80 + (off if i >= 3 else 0)
+            d.line([sx, y, sx + sw, y], fill=(205, 210, 215), width=2)
+            d.text((sx + 20, y + 40), a, font=P.font(36, "Medium"), fill=(40, 40, 50), anchor="lm")
+            d.text((sx + 330, y + 40), b, font=P.font(36, "Medium"), fill=(40, 40, 50), anchor="lm")
+            err = k * len(rows) > i
+            d.text((sx + 640, y + 40), "#ЗНАЧ!" if err else f"{[105000, 60000, 48000, 29600, 25300, 18400, 16500][i]:,}".replace(",", " "),
+                   font=P.font(36, "SemiBold"), fill=(210, 40, 40) if err else (33, 115, 70), anchor="lm")
+        y = sy + 150 + 8 * 80 + 40
+        d.rectangle([sx, y, sx + sw, y + 110], fill=(255, 236, 236) if k > 0.5 else (232, 245, 236))
+        d.text((sx + 20, y + 55), "На день", font=P.font(40, "SemiBold"), fill=(40, 40, 50), anchor="lm")
+        d.text((sx + 640, y + 55), "#ЗНАЧ!" if k > 0.5 else "1 940", font=P.font(52), fill=(210, 40, 40) if k > 0.5 else (20, 60, 40), anchor="lm")
+        if mode == "broken":  # курсор мечется
+            cx = sx + 640 + 140 * math.sin(t * 3.1); cy = sy + 300 + 260 * (0.5 + 0.5 * math.sin(t * 2.3))
+            d.polygon([(cx, cy), (cx + 34, cy + 80), (cx + 46, cy + 46), (cx + 80, cy + 34)], fill=(20, 20, 20), outline=WHITE)
+    ep.add(t0, t1, "screen", fn)
