@@ -55,8 +55,8 @@ def make(c):
         if s_.get("clip"): ep.clip(t, i1 + 0.3, s_["clip"], "insert", src_t0=s_.get("src", 0.0))
         if s_.get("fn"):  # метафора кодом, затем (rec) запись экрана в рамке телефона
             mid = t + (i1 + 0.3 - t) * s_.get("split", 1.0); s_["fn"](ep, t, mid)
-            if s_.get("pill"): ep.pill(mid + (i1 + 0.3 - mid) * s_["pill"][1], i1 + 0.3, s_["pill"][0], 540, 1820, size=48, **STY["green"])
-            if s_.get("rec"): ep.clip(mid, i1 + 0.3, s_["rec"] if s_["rec"].startswith("/") else REC + s_["rec"], "insrec", src_t0=s_.get("src", 0.0), phone=PH)
+            if s_.get("pill"): ep.pill(mid + (i1 + 0.3 - mid) * s_["pill"][1], i1 + 0.3, s_["pill"][0], 540, s_["pill"][2] if len(s_["pill"]) > 2 else 1820, size=48, **STY["green"])
+            if s_.get("rec"): ep.clip(mid, i1 + 0.3, s_["rec"] if s_["rec"].startswith("/") else REC + s_["rec"], "insrec", src_t0=s_.get("src", 0.0), speed=s_.get("rspeed", 1.0), phone=PH)
         ep.sfx(t + 0.2, "swish", 0.5)
         t = i1 + 0.3
 

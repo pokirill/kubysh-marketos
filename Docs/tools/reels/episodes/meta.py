@@ -284,3 +284,73 @@ def analytics_then_nav(ep, t0, t1, card="/Users/kirillpopov/Documents/Кубыш
         d.rounded_rectangle([170, 120, W - 170, 220], radius=50, fill=(40, 52, 46)); d.text((W / 2, 170), "Куда ушли деньги", font=P.font(52), fill=WHITE, anchor="mm")
     ep.add(t0, mid, "screen", fn)
     navigator(ep, mid, t1)
+
+
+JARS = [("Подушка", "25.11.2026"), ("Отпуск", "10.08.2027"), ("Айфон", "10.03.2027"), ("Ремонт", None)]
+
+
+def jars(ep, t0, t1, mode):
+    """Б2: банки целей. spread — одна струя мечется по всем банкам, в каждой по капле;
+    queue — Кубыш наполняет по очереди: подушка доверху, потом отпуск, у каждой дата; done — итог: две даты крупно."""
+    n = 4 if mode == "spread" else 2 if mode == "done" else 3
+    def fn(img, t, cam):
+        d = _bg(img, (34, 44, 66), (14, 18, 30))
+        jw, gap = (200, 50) if n == 4 else (250, 70) if n == 3 else (360, 100)
+        x0 = (W - n * jw - (n - 1) * gap) / 2; jy, jh = 900, 520
+        k = seg(t, t0, t1)
+        for i in range(n):
+            name, date = JARS[i]; x = x0 + i * (jw + gap)
+            if mode == "spread": lvl = 0.06 + 0.03 * math.sin(t * 3 + i)
+            elif mode == "queue": lvl = [eout(seg(k, 0.1, 0.55)), 0.35 * eout(seg(k, 0.55, 0.95)), 0.0][i]
+            else: lvl = [1.0, 0.45][i]
+            if lvl > 0.01: d.rectangle([x + 14, jy + jh - 14 - (jh - 40) * lvl, x + jw - 14, jy + jh - 14], fill=(255, 200, 60))
+            d.rounded_rectangle([x, jy, x + jw, jy + jh], radius=40, outline=(225, 235, 245), width=10)
+            d.text((x + jw / 2, jy - 60), name, font=P.font(52 if n < 4 else 42, "SemiBold"), fill=WHITE, anchor="mm")
+            if mode != "spread" and date and (mode == "done" or k > [0.3, 0.7, 0.85][i]):
+                d.text((x + jw / 2, jy + jh + 70), date, font=P.font(64 if n == 2 else 46), fill=(140, 240, 180), anchor="mm")
+        if mode != "done":  # карточка «Зарплата», из нее падают монеты: spread — по всем банкам вразброс, queue — в одну
+            d.rounded_rectangle([W / 2 - 230, 230, W / 2 + 230, 420], radius=30, fill=(52, 120, 246))
+            d.text((W / 2, 290), "Зарплата", font=P.font(52, "SemiBold"), fill=WHITE, anchor="mm")
+            d.text((W / 2, 365), "+150 000 ₽", font=P.font(56), fill=WHITE, anchor="mm")
+            for j in range(10):
+                ph = (t * 1.1 + j / 10) % 1
+                tgt = j % n if mode == "spread" else (0 if k < 0.55 else 1)
+                cx = lerp(W / 2, x0 + tgt * (jw + gap) + jw / 2, ph); cy = lerp(430, jy + jh - 80, ph * ph)
+                d.ellipse([cx - 30, cy - 30, cx + 30, cy + 30], fill=(255, 200, 60), outline=(200, 140, 30), width=4)
+                d.text((cx, cy), "₽", font=P.font(34), fill=(120, 80, 10), anchor="mm")
+    ep.add(t0, t1, "screen", fn)
+
+
+def pocket(ep, t0, t1, value=2000):
+    """Б4: дырявый карман джинсов — сэкономленные 2 000 высыпаются монетами «кофе», «доставка», «мелочи», счетчик тает до нуля."""
+    labs = ["кофе", "доставка", "мелочи", "такси"]
+    def fn(img, t, cam):
+        d = _bg(img, (40, 58, 96), (16, 22, 40))
+        px, py = 290, 560
+        d.rounded_rectangle([px, py, px + 500, py + 560], radius=60, fill=(60, 90, 150), outline=(30, 50, 90), width=10)
+        d.line([px + 40, py + 70, px + 460, py + 70], fill=(220, 180, 90), width=8)
+        d.ellipse([px + 200, py + 520, px + 300, py + 590], fill=(16, 22, 40))  # дырка
+        k = seg(t, t0 + 0.3, t1 - 0.3)
+        for j in range(8):
+            ph = (t * 1.3 + j / 8) % 1; x = px + 250 + 30 * math.sin(j * 2.1); y = py + 560 + 700 * ph * ph
+            d.ellipse([x - 40, y - 40, x + 40, y + 40], fill=(255, 200, 60), outline=(200, 140, 30), width=5)
+            if j % 2 == 0: d.text((x + 70, y), labs[(j // 2) % 4], font=P.font(40, "Medium"), fill=(255, 150, 150), anchor="lm")
+        v = int(value * (1 - eio(k)) / 10) * 10
+        s = word_img("Сэкономил " + f"{v:,}".replace(",", " ") + " ₽", 84, fill=(255, 214, 74)); comp(img, s, W / 2 - s.width / 2, 300)
+    ep.add(t0, t1, "screen", fn)
+
+
+def fork(ep, t0, t1, value=2000):
+    """Итог Б4: монета «2 000» на развилке, два указателя «Отпуск» и «Выходные» — выбор за человеком."""
+    def fn(img, t, cam):
+        d = _bg(img, (22, 70, 52), (8, 26, 20))
+        d.polygon([(460, 1700), (620, 1700), (560, 1000), (520, 1000)], fill=(200, 190, 160))
+        d.polygon([(520, 1000), (560, 1000), (300, 620), (220, 640)], fill=(200, 190, 160))
+        d.polygon([(520, 1000), (560, 1000), (860, 640), (780, 620)], fill=(200, 190, 160))
+        for x, y, lab, col in [(120, 470, "Цель", (60, 170, 110)), (640, 470, "Выходные", (240, 150, 60))]:
+            d.rounded_rectangle([x, y, x + 320, y + 110], radius=24, fill=col)
+            d.text((x + 160, y + 55), lab, font=P.font(52, "SemiBold"), fill=WHITE, anchor="mm")
+        sw = 40 * math.sin(t * 2.2); cx, cy = 540 + sw, 1080
+        d.ellipse([cx - 110, cy - 110, cx + 110, cy + 110], fill=(255, 200, 60), outline=(200, 140, 30), width=10)
+        d.text((cx, cy), f"{value:,}".replace(",", " "), font=P.font(64), fill=(90, 60, 10), anchor="mm")
+    ep.add(t0, t1, "screen", fn)
