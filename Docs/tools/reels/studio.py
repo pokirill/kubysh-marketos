@@ -749,7 +749,7 @@ class Ep:
         if isinstance(frames, dict):
             if i < len(frames["clip"]):
                 im = self._jpg(frames["clip"][i])
-                if h.get("text"): self._text_block(im, h["text"], 250, 96, YEL, back(seg(i / FPS, 0.1, 0.4), 1.8))
+                if h.get("text"): self._text_block(im, h["text"], h.get("y", 250), 80, YEL, back(seg(i / FPS, 0.1, 0.4), 1.8))
                 return im
             r = frames["rew"]; return self._rewind_fx(self._jpg(r[min(len(r) - 1, i - len(frames["clip"]))]), i)
         hold = int(h["hold"] * FPS)
