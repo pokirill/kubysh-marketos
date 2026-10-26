@@ -12,7 +12,7 @@ Y = 1560
 
 def make(name, segs, cta, hook_text, hook_y=250, kub_cta=PHONE):
     ep = Ep(f"{name}_{cta}", "studio"); ep.sfxgain = 0.4
-    ep.avatars = {w: Image.open(RK + f"Референсы/avatar_{w}.png").convert("RGBA") for w in ("ksy", "kubysh", "dush", "friend")}
+    ep.avatars = {w: Image.open(RK + f"Референсы/avatar_{w}.png").convert("RGBA") for w in ("ksy", "kubysh", "dush", "friend", "max")}
     t, hk = 0.1, None
     for s in segs:
         a0, a1 = ep.say(s["who"], "", cap=s["cap"], y=Y, size=s.get("size", 60), at=t, file=VO + s["vo"] + "_f_48k.wav")
