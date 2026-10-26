@@ -30,6 +30,7 @@ def make(name, segs, cta, hook_text, hook_y=250, kub_cta=PHONE):
     e0, e1 = ep.say("kubysh", CTA[cta][0], cap=CTA[cta][1], y=Y, size=62, at=t, file=VO + ("t_02_cta_a" if cta == "A" else "t_03_cta_b") + "_f_48k.wav")
     end = e1 + 1.6
     icon(ep, e0, end, y=820, size=230)
+    ep.pill(e1 - 0.4, end, "Комфортно сегодня, спокойно завтра", 540, 1190, size=46, **STY["green"]); ep.sfx(e1 - 0.4, "pop", 0.4)   # обещание, итог 27.10
     ep.clip(t - 0.05, end, kub_cta, "kub_cta", speed=min(1.0, 4.9 / (end - t)))
     ep.dur = end
     if hk: ep.hook_clip(*hk, text=hook_text); ep.hook["y"] = hook_y

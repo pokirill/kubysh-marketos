@@ -276,7 +276,7 @@ def scene_recalc(cv, t):
 
 def scene_relief(cv, t):
     cv.alpha_composite(clip_frame("relief.mp4", t - C3, 1.0)); shade(cv)
-    title(cv, t, C3 + 0.2, T4 + 0.1, ["Тратишь *спокойно*.", "Подушка и цели — по плану"], y=1470, size=70)
+    title(cv, t, C3 + 0.2, T4 + 0.1, ["Тратишь *спокойно*.", "Подушка и цели по плану"], y=1470, size=70)
 
 
 _PH = {}
@@ -298,8 +298,8 @@ def scene_end(cv, t):
     p = phone(); k = eout(span(t, T4, T4 + 0.7))
     put(cv, p["img"], W / 2, lerp(1450, 760, k), scale=lerp(0.9, 0.96, span(t, T4, END)))     # медленный наезд
     put(cv, p["mas"], 880, lerp(1950, 1150, eback(span(t, T4 + 0.5, T4 + 1.0))), scale=0.8)
-    title(cv, t, T4 + 0.8, END + 1, ["Копить *без тревоги*"], y=1440)
-    put(cv, text_img("Кубыш считает за тебя", 46, SUB, "SemiBold"), W / 2, 1535, a=eout(span(t, T4 + 1.1, T4 + 1.5)))
+    title(cv, t, T4 + 0.8, END + 1, ["Комфортно *сегодня*,", "спокойно *завтра*"], y=1380)   # обещание, итог 27.10
+    put(cv, text_img("Сумма на день, подушка и цели по плану", 40, SUB, "SemiBold"), W / 2, 1560, a=eout(span(t, T4 + 1.1, T4 + 1.5)))
     kb = eout(span(t, T4 + 1.5, T4 + 1.9))
     put(cv, p["icon"], 235, 1720, a=kb)
     btn = Image.new("RGBA", (560, 120), (0, 0, 0, 0)); ImageDraw.Draw(btn).rounded_rectangle([0, 0, 559, 119], 60, fill=GREEN)
