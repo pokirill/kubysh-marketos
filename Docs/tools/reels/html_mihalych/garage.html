@@ -85,8 +85,10 @@ body.render #ctrl{display:none}
 </div></div>
 <div id="ctrl"><button id="play" type="button">Пауза</button><input id="seek" type="range" min="0" max="27" step="0.01" value="0" aria-label="Перемотка"><span id="tc">0.0 с</span></div>
 
+<script>window.VO_DATA={{VO}};</script>
 <script>
-const D=27.0, $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
+const VO=window.VO_DATA; let RT=0;
+const D=VO?VO.D:27.0, $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
 const TEA=location.hash.includes('tea');
 const cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)), seg=(t,a,b)=>cl((t-a)/(b-a)), lerp=(a,b,k)=>a+(b-a)*k;
 const eout=x=>1-Math.pow(1-cl(x),3), eio=x=>{x=cl(x);return x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2}, back=x=>{x=cl(x)-1;return x*x*(2.8*x+1.8)+1};
@@ -94,6 +96,9 @@ const inout=(t,a,b,fi=.3,fo=.25)=>Math.min(eout(seg(t,a,a+fi)),1-seg(t,b-fo,b));
 const show=(el,o)=>{el.style.opacity=o;el.style.visibility=o<=0.001?'hidden':'visible'};
 const hash=n=>{const x=Math.sin(n*127.1+311.7)*43758.5453;return x-Math.floor(x)};
 const P=(a,b,k)=>[lerp(a[0],b[0],k),lerp(a[1],b[1],k)];
+function unwarp(t){if(!VO)return t;const w=VO.warp;for(let i=1;i<w.length;i++)if(t<w[i][1]){const k=(t-w[i-1][1])/(w[i][1]-w[i-1][1]);return lerp(w[i-1][0],w[i][0],k)}return w[w.length-1][0]}
+function warp(T){if(!VO)return T;const w=VO.warp;if(T<=w[0][0])return w[0][1];for(let i=1;i<w.length;i++)if(T<w[i][0]){const k=(T-w[i-1][0])/(w[i][0]-w[i-1][0]);return lerp(w[i-1][1],w[i][1],k)}return w[w.length-1][1]}
+const envAt=(a,T)=>{if(!VO||!a)return 0;const i=Math.floor(T*100);return a[Math.max(0,Math.min(a.length-1,i))]||0};
 
 /* ---------- palette for the cartoon ---------- */
 const C={line:'#1d140e',skin:'#efb58f',skinD:'#d98f6c',nose:'#d6504a',hair:'#6b4423',hairD:'#4b2f18',blue:'#3c6db4',white:'#f1efe8',
@@ -287,16 +292,16 @@ const atMouth=t=>Math.hypot(handL(t)[0]-MOUTH[0],handL(t)[1]-MOUTH[1])<40;
 const exhaleW=[[1.35,2.4,1],[8.75,9.7,2.4]];
 
 function bulbPos(t){const th=(6*Math.sin(t*1.25)+2*Math.sin(t*2.9))*Math.PI/180,L=150;return [540+L*Math.sin(th),250+L*Math.cos(th),th]}
-function flyPos(t){const b=bulbPos(t);let x=b[0]+120*Math.cos(t*2.6)+28*Math.sin(t*7.1),y=b[1]+70+55*Math.sin(t*4.1)+18*Math.cos(t*9.3);
-  if(t>=20.9){const k=eio(seg(t,20.9,21.5));const n=[540,748];x=lerp(x,n[0],k)+(1-k)*30*Math.sin(t*12);y=lerp(y,n[1],k)}
+function flyPos(rt,t){if(t===undefined)t=rt;const b=bulbPos(rt);let x=b[0]+120*Math.cos(rt*2.6)+28*Math.sin(rt*7.1),y=b[1]+70+55*Math.sin(rt*4.1)+18*Math.cos(rt*9.3);
+  if(t>=20.9){const k=eio(seg(t,20.9,21.5));const n=[540,748];x=lerp(x,n[0],k)+(1-k)*30*Math.sin(rt*12);y=lerp(y,n[1],k)}
   return [x,y]}
 window.flyPos=flyPos;
 
 function drawFront(t){
   // torso breathing, head motion
-  const br=1+0.012*Math.sin(t*2.1);
+  const br=1+0.012*Math.sin(RT*2.1);
   $('torso').setAttribute('transform',`translate(540 1260) scale(1 ${br}) translate(-540 -1260)`);
-  let tilt=2*Math.sin(t*1.1); if(t>6.4&&t<7.3)tilt+=6; if(t>=19)tilt=-3+1.5*Math.sin(t*1.3);
+  let tilt=2*Math.sin(RT*1.1); if(t>6.4&&t<7.3)tilt+=6; if(t>=19)tilt=-3+1.5*Math.sin(RT*1.3); tilt+=4*envAt(VO&&VO.envM,RT)*Math.sin(RT*7);
   const hy=(br-1)*-500 + (atMouth(t)?4:0);
   $('head').setAttribute('transform',`translate(0 ${hy}) rotate(${tilt} 540 760)`);
   // eyes
@@ -304,7 +309,7 @@ function drawFront(t){
   const pl=$('pupL'),pr=$('pupR');
   if(look){pl.setAttribute('cx',490+look[0]);pl.setAttribute('cy',602+look[1]);pr.setAttribute('cx',590+look[0]);pr.setAttribute('cy',602+look[1])}
   else{pl.setAttribute('cx',504);pl.setAttribute('cy',606);pr.setAttribute('cx',576);pr.setAttribute('cy',606)}  // cross-eyed at the fly
-  let lid=t>=19?0.25:0.48; if(t>=21.4)lid=0.05; if(((t+0.4)%3.3)<0.13)lid=1;
+  let lid=t>=19?0.25:0.48; if(t>=21.4)lid=0.05; if(((RT+0.4)%3.3)<0.13)lid=1;
   const lidPath=(cx)=>{const y0=579,y1=y0+lid*42;return `M${cx-30} ${y0+6} Q${cx} ${y0-14} ${cx+30} ${y0+6} L${cx+30} ${y1} Q${cx} ${y1+6} ${cx-30} ${y1} Z`};
   $('lidL').setAttribute('d',lidPath(490));$('lidR').setAttribute('d',lidPath(590));
   // brows: worried until 19
@@ -319,12 +324,15 @@ function drawFront(t){
   if(t>=20.6)m='smile'; if(t>=21.4)m='o';
   const MO={frown:'M505 722 Q540 704 575 722 Q540 714 505 722Z',purse:'M528 712 Q540 704 552 712 Q540 722 528 712Z',sip:'M520 716 Q540 710 560 716 Q540 722 520 716Z',
     o:'M524 712 Q540 694 556 712 Q540 734 524 712Z',talk:'M505 708 Q540 700 575 708 Q540 744 505 708Z',smile:'M500 706 Q540 724 580 706 Q540 746 500 706Z'};
+  if(VO){const e=envAt(VO.envM,RT);if(e>0.12&&!atMouth(t))m=e>0.45?'talk':(t>=19?'smile':'o')}
   $('mouth').setAttribute('d',MO[m]);
   // face light from phone: blue until 9, green flash 9.05–9.6
   const fg=$('faceGlow'); fg.setAttribute('fill',t>9.05&&t<9.7?'url(#gglow)':'url(#pglow)'); fg.setAttribute('opacity',t>=19?0:(t>9.05&&t<9.7?0.8:0.45));
   $('phoneEdge').setAttribute('stroke-width',t>9.05&&t<9.7?10:0);
   // arms
-  const HL=handL(t),HR=handR(t);
+  let HL=handL(t),HR=handR(t);
+  if(VO){const a=envAt(VO.actM,RT),rest=Math.hypot(HL[0]-REST_L[0],HL[1]-REST_L[1])<60;
+    if(rest&&a>0.02){const k=cl(a*2.2);HL=[HL[0]+k*(60+45*Math.sin(RT*4.3)),HL[1]-k*(210+50*Math.abs(Math.sin(RT*3.1)))]}}
   let [E,H]=ik(SH_L,HL,-1);
   $('uL').setAttribute('transform',segT(SH_L,E));$('fL').setAttribute('transform',segT(E,H));
   const ang=Math.atan2(H[1]-E[1],H[0]-E[0])*180/Math.PI;
@@ -332,33 +340,33 @@ function drawFront(t){
   [E,H]=ik(SH_R,HR,1);
   $('uR').setAttribute('transform',segT(SH_R,E));$('fR').setAttribute('transform',segT(E,H));
   $('hR').setAttribute('transform',`translate(${H[0]} ${H[1]}) rotate(${t>=19?-70*eio(seg(t,19,19.6)):-8})`);
-  $('ember').setAttribute('r',atMouth(t)?9:5+Math.sin(t*9));
+  $('ember').setAttribute('r',atMouth(t)?9:5+Math.sin(RT*9));
   // bulb + glow
-  const b=bulbPos(t); $('cord').setAttribute('x1',540);$('cord').setAttribute('y1',250);$('cord').setAttribute('x2',b[0]);$('cord').setAttribute('y2',b[1]-10);
+  const b=bulbPos(RT); $('cord').setAttribute('x1',540);$('cord').setAttribute('y1',250);$('cord').setAttribute('x2',b[0]);$('cord').setAttribute('y2',b[1]-10);
   $('bulb').setAttribute('transform',`translate(${b[0]} ${b[1]}) rotate(${-b[2]*180/Math.PI})`);
-  let fl=1; if(t>8.0&&t<9.6)fl=0.55+0.45*(hash(Math.floor(t*14))>0.35?1:0.2);
+  let fl=1; if(t>8.0&&t<9.6)fl=0.55+0.45*(hash(Math.floor(RT*14))>0.35?1:0.2);
   $('glowF').setAttribute('cx',b[0]);$('glowF').setAttribute('cy',b[1]+62);$('glowF').setAttribute('opacity',0.9*fl);
   $('cone').setAttribute('points',`${b[0]-30},${b[1]+80} ${b[0]+30},${b[1]+80} ${b[0]+420},1330 ${b[0]-420},1330`);$('cone').setAttribute('opacity',0.45*fl);$('pool').setAttribute('opacity',0.28*fl);
   // fly
-  const f=flyPos(t), wf=Math.floor(t*60)%2?0.35:1; const fx=f[0], fy=f[1];
-  $('fly').setAttribute('transform',`translate(${fx} ${fy}) scale(1.3) rotate(${15*Math.sin(t*7)})`);
+  const f=flyPos(RT,t), wf=Math.floor(RT*60)%2?0.35:1; const fx=f[0], fy=f[1];
+  $('fly').setAttribute('transform',`translate(${fx} ${fy}) scale(1.3) rotate(${15*Math.sin(RT*7)})`);
   $('wing1').setAttribute('ry',14*(t>=21.5?0.6:wf));$('wing2').setAttribute('ry',14*(t>=21.5?0.6:wf));
-  const tap=t<7.6?Math.max(0,Math.sin(t*14))*10:0; $('slipR').setAttribute('transform',`rotate(${-tap} 560 1595)`);
+  const tap=t<7.6?Math.max(0,Math.sin(RT*14))*10:0; $('slipR').setAttribute('transform',`rotate(${-tap} 560 1595)`);
   // Kubysh on table (final)
-  const kt=$('kubTable'),kk=back(seg(t,20.6,20.95));kt.setAttribute('transform',`translate(740 1060) scale(${t>=20.6?kk*0.8:0.001}) rotate(${Math.sin(t*6)*4})`);
+  const kt=$('kubTable'),kk=back(seg(t,20.6,20.95));kt.setAttribute('transform',`translate(740 1060) scale(${t>=20.6?kk*0.8*(1+0.08*envAt(VO&&VO.envK,RT)):0.001}) rotate(${Math.sin(t*6)*4})`);
   // smoke / steam particles
   let n=0; const put=(x,y,r,o)=>{if(n>=pool.length)return;const c=pool[n++];c.setAttribute('cx',x);c.setAttribute('cy',y);c.setAttribute('r',r);c.setAttribute('opacity',o)};
   const WL=1.7;
-  for(let b0=Math.floor((t-WL)/0.09)*0.09;b0<=t;b0+=0.09){if(b0<0||(b0>9.7&&b0<19)||b0>23)continue;const a=t-b0;const p=tipAt(b0);const k=a/WL;
+  for(let r0=Math.floor((RT-WL)/0.09)*0.09;r0<=RT;r0+=0.09){const b0=warp(r0);if(r0<0||(b0>9.7&&b0<19)||b0>23)continue;const a=RT-r0;const p=tipAt(b0);const k=a/WL;
     put(p[0]+18*Math.sin(b0*9+a*3)+a*10,p[1]-a*120,6+a*22,(TEA?0.4:0.32)*(1-k))}
-  if(!TEA)for(const [a0,a1,big] of exhaleW){for(let b0=a0;b0<a1-0.3;b0+=0.05){if(b0>t)break;const a=t-b0;if(a>2.4)continue;
+  if(!TEA)for(const [a0,a1,big] of exhaleW){for(let b0=a0;b0<a1-0.3;b0+=0.05){if(b0>t)break;const a=VO?RT-unwarp(b0):t-b0;if(a>2.4||a<0)continue;
     const r1=hash(b0*13),r2=hash(b0*7+1);put(MOUTH[0]+(r1-0.5)*80*big+a*(r1-0.5)*160*big,MOUTH[1]-a*(70+90*r2)*big+10,(14+a*40)*big,0.55*(1-a/2.4))}}
   for(;n<pool.length;n++)pool[n].setAttribute('opacity',0);
 }
 function drawBack(t,z){
-  const f=flyPos(t), b=[540,230];  // fly around the bulb in back view, same rhythm
-  const fx=b[0]+(f[0]-bulbPos(t)[0]), fy=b[1]+(f[1]-bulbPos(t)[1]);
-  $('flyB').setAttribute('transform',`translate(${fx} ${fy})`); const wf=Math.floor(t*60)%2?0.35:1;$('wb1').setAttribute('ry',14*wf);$('wb2').setAttribute('ry',14*wf);
+  const f=flyPos(RT,t), b=[540,230];  // fly around the bulb in back view, same rhythm
+  const fx=b[0]+(f[0]-bulbPos(RT)[0]), fy=b[1]+(f[1]-bulbPos(RT)[1]);
+  $('flyB').setAttribute('transform',`translate(${fx} ${fy})`); const wf=Math.floor(RT*60)%2?0.35:1;$('wb1').setAttribute('ry',14*wf);$('wb2').setAttribute('ry',14*wf);
   const ip=back(seg(t,10.7,11.1)); $('scrIcon').setAttribute('transform',`translate(0 ${-30*ip}) scale(${1+0.35*ip})`);
   $('scrTxt').setAttribute('opacity',1-ip); $('scrGlow').setAttribute('opacity',0.7+0.3*Math.sin(t*5));
 }
@@ -378,7 +386,8 @@ const pushes=$('pushes'), chips=$('chips');
 PUSH.forEach(p=>{const d=document.createElement('div');d.className='abs push';d.innerHTML=`<div class="ic">${p[0]}</div><div class="t">${p[1]}<small>${p[2]}</small></div><div class="s">${p[3]}</div>`;pushes.appendChild(d)});
 CHIPS.forEach(c=>{const d=document.createElement('div');d.className='abs chip '+c[2];d.textContent=c[1];d.style.top=c[3]+'px';chips.appendChild(d)});
 
-function render(t){
+function render(T){
+  RT=T; const t=warp(T);
   const front=$('front'),bk=$('back');
   const inFront=t<10.1||(t>=19&&t<23)||t>=26.6, inBack=t>=9.6&&t<13.6, inApp=t>=13.2&&t<19.4, inEnd=t>=22.9;
   // camera for front shot
@@ -409,8 +418,8 @@ function render(t){
   // top + captions
   const tp=TOPS.find(x=>t>=x[0]&&t<x[1]),top=$('top');
   if(tp){top.textContent=tp[2];const k=back(seg(t,tp[0],tp[0]+0.3));show(top,inout(t,tp[0],tp[1],.15,.2));top.style.transform=`scale(${0.7+0.3*k})`}else show(top,0);
-  const cp=CAPS.find(x=>t>=x[0]&&t<x[1]),cap=$('cap');
-  if(cp){words(cap,cp[2],cp[0],t,cp[3]||'hl');show(cap,1-seg(t,cp[1]-0.15,cp[1]))}else show(cap,0);
+  const CL=VO?VO.caps:CAPS, tc=VO?RT:t; const cp=CL.find(x=>tc>=x[0]&&tc<x[1]),cap=$('cap');
+  if(cp){words(cap,cp[2],cp[0],tc,cp[3]||'hl');show(cap,1-seg(tc,cp[1]-0.15,cp[1]))}else show(cap,0);
   // pushes
   [...pushes.children].forEach((d,i)=>{const t0=PUSH[i][4];const k=eout(seg(t,t0,t0+0.3));const n=PUSH.filter(p=>p[4]<=t).length;const y=170+(n-1-i)*148;
     d.style.top=y+'px';d.style.transform=`translateY(${-160*(1-k)}px) scale(${0.9+0.1*k})`;const age=n-1-i;show(d,t>=t0&&t<7.6&&age<3?k*(1-seg(t,7.35,7.6))*(age<2?1:0.6):0)});
@@ -436,7 +445,8 @@ function render(t){
   // end card
   const e=$('end');show(e,inEnd?eout(seg(t,22.9,23.3))*(1-seg(t,26.6,27)):0);
   [...e.children].forEach((c,i)=>{const k=back(seg(t,23.0+i*0.25,23.35+i*0.25));c.style.transform=`translateY(${40*(1-k)}px) scale(${0.85+0.15*k})`;c.style.opacity=cl(k*1.5)});
-  $('bar').style.width=(1080*t/D)+'px';
+  $('bar').style.width=(1080*RT/D)+'px';
+  if(VO){const e=envAt(VO.envK,RT);const sc=1+0.07*e;$('kubSvg').style.transform=`scale(${sc})`;$('scrIcon').setAttribute('transform',$('scrIcon').getAttribute('transform')+` scale(${sc})`)}
 }
 window.render=render; window.DUR=D;
 
