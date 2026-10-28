@@ -100,18 +100,7 @@ const C={line:'#1d140e',skin:'#efb58f',skinD:'#d98f6c',nose:'#d6504a',hair:'#6b4
   wall:'#4a3b2c',wallD:'#2a2119',wood:'#93623a',woodD:'#5b3b20',floor:'#2c2a27',metal:'#7d8287',bulb:'#fff3c4'};
 
 /* ---------- build SVG ---------- */
-const FROG=`<g stroke="#1d140e" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
- <path d="M-95 70 C-120 0 -100 -70 -60 -88 L60 -88 C100 -70 120 0 95 70 C70 105 -70 105 -95 70Z" fill="#5fb84a"/>
- <path d="M-60 40 C-60 0 60 0 60 40 C55 80 -55 80 -60 40Z" fill="#f2d675"/>
- <circle cx="-48" cy="-92" r="38" fill="#5fb84a"/><circle cx="48" cy="-92" r="38" fill="#5fb84a"/>
- <circle cx="-48" cy="-92" r="25" fill="#fff"/><circle cx="48" cy="-92" r="25" fill="#fff"/>
- <circle class="fp" cx="-42" cy="-90" r="10" fill="#1a1a1a" stroke="none"/><circle class="fp" cx="54" cy="-90" r="10" fill="#1a1a1a" stroke="none"/>
- <path d="M-74 -100 Q-48 -122 -22 -100 L-22 -110 Q-48 -134 -74 -110Z" fill="#4a9a3a"/><path d="M22 -100 Q48 -122 74 -100 L74 -110 Q48 -134 22 -110Z" fill="#4a9a3a"/>
- <path class="fm" d="M-60 -38 Q0 -8 60 -38" fill="none"/>
- <circle cx="-66" cy="-40" r="10" fill="#e2736a" stroke="none" opacity=".5"/><circle cx="66" cy="-40" r="10" fill="#e2736a" stroke="none" opacity=".5"/>
- <circle cx="62" cy="38" r="34" fill="#f2c230"/><text x="62" y="51" font-family="Inter,sans-serif" font-weight="900" font-size="38" text-anchor="middle" fill="#8a5a00" stroke="none">₽</text>
- <ellipse cx="34" cy="40" rx="20" ry="15" fill="#5fb84a"/><ellipse cx="-70" cy="40" rx="20" ry="15" fill="#5fb84a"/>
- <ellipse cx="-50" cy="98" rx="34" ry="14" fill="#4a9a3a"/><ellipse cx="50" cy="98" rx="34" ry="14" fill="#4a9a3a"/></g>`;
+const FROG=`<image href="{{AVA}}" x="-125" y="-140" width="250" height="235"/>`;
 
 const sv=$('sv');
 sv.innerHTML=`
@@ -379,7 +368,7 @@ function words(el,txt,t0,t,cls='hl'){
   if(el.dataset.k!==txt){el.dataset.k=txt;let on=false;el.innerHTML=txt.split(' ').map(w=>{let a=on||w.startsWith('*');if(w.startsWith('*'))on=true;if(w.endsWith('*'))on=false;w=w.replace(/\*/g,'');return `<span class="w${a?' '+cls:''}">${w}</span>`}).join('')}
   [...el.children].forEach((s,i)=>{const k=back(seg(t,t0+i*0.07,t0+i*0.07+0.22));s.style.opacity=cl(k*1.4);s.style.transform=`scale(${0.6+0.4*k})`});
 }
-const CAPS=[[0.25,2.6,'Хватит или *нет?*','red'],[2.9,5.6,TEA?'Ну семечки, ну огурчики, ну *по мелочи*':'Ну бутылочка, ну сиги, ну *по мелочи*'],[5.6,7.6,'А сколько осталось, *непонятно*','red'],
+const CAPS=[[0.2,1.45,TEA?'Пять дней до получки, *обалдеть*':'Пять дней до получки, *охренеть*','red'],[1.45,2.6,'А еще Семенычу *должок* отдать'],[2.9,5.6,TEA?'Ну семечки, ну огурчики, ну *по мелочи*':'Ну бутылочка, ну сиги, ну *по мелочи*'],[5.6,6.7,'А сколько осталось, *непонятно*','red'],[6.7,7.6,TEA?'Ох уж эти *банки*':'*Сраные* банки','red'],
   [8.55,9.6,'как *в тумане*'],[15.6,18.9,'Каждый день знаешь, сколько *можно сегодня*','grn']];
 const TOPS=[[0.0,2.6,'Я, когда до получки 5 дней'],[7.9,9.6,'Жизнь без плана']];
 const PUSH=TEA?[['🛒','Магазин у дома','Чипсы и семечки','−410 ₽',3.0],['🥒','Огурцы малосольные','Рынок','−320 ₽',3.65],['🛒','Магазин у дома','Еще по мелочи','−560 ₽',4.3],['🥒','Огурцы малосольные','Рынок, еще банка','−320 ₽',4.95],['🛒','Магазин у дома','Ну очень нужно','−780 ₽',5.6]]
