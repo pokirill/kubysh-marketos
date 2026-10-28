@@ -1,0 +1,465 @@
+<title>Михалыч в гараже</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700;800;900&display=swap">
+<style>
+/* Layout: one 1080×1920 reel stage; SVG garage world (front + over-the-shoulder shots) under HTML captions */
+:root{
+  --ink:#06100c; --app:#0b1512; --fg:#f3f6f4; --muted:#9fb0a9;
+  --green:#3ecf86; --red:#ff7474; --amber:#ffc44d; --plate:#000000d9;
+  --display:"Inter Tight","Inter Display","Inter",system-ui,sans-serif;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--ink);color:var(--fg);font-family:var(--display);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;overflow:hidden}
+body.render{padding:0;display:block}
+#wrap{position:relative;width:min(100%,calc((100vh - 90px) * 0.5625));aspect-ratio:9/16;max-width:100%}
+body.render #wrap{width:1080px;height:1920px}
+#stage{position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:0 0;overflow:hidden;background:var(--app)}
+.abs{position:absolute}
+#appbg{inset:0;background:radial-gradient(700px 600px at 15% 10%,#1f6b4a66,transparent 70%),radial-gradient(700px 700px at 90% 90%,#1d3f6e55,transparent 70%),linear-gradient(#09110e,#030605)}
+#sv{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#fog{inset:0;background:radial-gradient(circle at 50% 40%,#d9d4cacc,#9c968bcc);opacity:0;mix-blend-mode:screen}
+#top{left:60px;right:60px;top:150px;text-align:center;font-weight:900;font-size:84px;line-height:1.08;letter-spacing:-.02em;text-wrap:balance;text-shadow:0 4px 0 #000,0 0 24px #000a}
+#cap{left:90px;right:90px;top:1600px;display:flex;flex-wrap:wrap;justify-content:center;gap:12px 14px}
+.w{background:var(--plate);border-radius:18px;padding:8px 18px 12px;font-weight:800;font-size:64px;line-height:1.05;letter-spacing:-.01em}
+.w.hl{color:var(--amber)} .w.red{color:var(--red)} .w.grn{color:var(--green)}
+.push{left:70px;width:940px;height:132px;border-radius:34px;background:#1b2421f2;border:2px solid #ffffff17;display:flex;align-items:center;gap:26px;padding:0 34px;box-shadow:0 20px 50px #0009}
+.push .ic{width:76px;height:76px;border-radius:20px;background:#2a3431;display:grid;place-items:center;font-size:44px}
+.push .t{flex:1;font-size:40px;font-weight:600;color:var(--fg)}
+.push .t small{display:block;font-size:30px;color:var(--muted);font-weight:500}
+.push .s{font-size:48px;font-weight:800;color:var(--red);font-variant-numeric:tabular-nums}
+#rew{left:60px;top:80px;font-weight:800;font-size:46px;color:#fff;background:#d23b3bdd;border-radius:14px;padding:8px 20px}
+#scan{inset:0;background:repeating-linear-gradient(#ffffff0c 0 2px,transparent 2px 6px);mix-blend-mode:overlay}
+#kub{width:230px;height:230px}
+#kub svg{overflow:visible;filter:drop-shadow(0 14px 30px #000a)}
+.bub{background:#f6fbf8;color:#0a1410;font-weight:800;font-size:58px;line-height:1.1;border-radius:40px;padding:26px 36px;max-width:760px;box-shadow:0 18px 50px #0008;text-wrap:balance}
+.bub b{color:#1a9c5c}
+.bub.mih{background:#fff3d6}
+#phone{left:40px;top:300px;width:1000px;border-radius:40px;overflow:hidden;box-shadow:0 40px 90px #000c}
+#phone img{width:1000px;display:block}
+#ring{border:8px solid var(--green);border-radius:34px;box-shadow:0 0 0 9999px #00000088,0 0 40px #3ecf86}
+.chip{left:50%;font-weight:700;font-size:52px;border-radius:999px;padding:16px 38px;white-space:nowrap;background:#10261c;border:3px solid #3ecf86aa;color:var(--green);box-shadow:0 0 40px #3ecf8640}
+.chip.blu{background:#132033;border-color:#6aa6ff99;color:#a9ccff}
+#end{inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;text-align:center;background:radial-gradient(700px 600px at 50% 35%,#1f6b4a55,transparent 70%),linear-gradient(#09110e,#030605)}
+#end img{width:320px;height:320px;border-radius:74px;box-shadow:0 0 0 8px #3ecf86,0 30px 80px #000c}
+#end h1{margin:0;font-size:120px;font-weight:900;letter-spacing:-.03em}
+#end p{margin:0;font-size:58px;font-weight:700;color:var(--fg)}
+#end .cta{font-size:62px;font-weight:800;background:var(--green);color:#062014;border-radius:999px;padding:24px 56px}
+#end .sub{font-size:48px;font-weight:600;color:var(--green)}
+#bar{left:0;top:0;height:10px;background:var(--green)}
+#flash{inset:0;background:#fff;opacity:0}
+#ctrl{display:flex;gap:12px;align-items:center;width:min(100%,560px)}
+#ctrl button{font:600 15px var(--display);background:var(--green);color:#062014;border:0;border-radius:999px;padding:8px 18px;cursor:pointer}
+#ctrl button:focus-visible,#ctrl input:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+#ctrl input{flex:1;accent-color:var(--green)}
+#ctrl span{font:500 14px var(--display);color:var(--muted);font-variant-numeric:tabular-nums;min-width:54px}
+body.render #ctrl{display:none}
+</style>
+
+<div id="wrap"><div id="stage">
+  <div id="appbg" class="abs"></div>
+  <div id="phone" class="abs"><img src="{{SCR}}" alt="Экран Получки в Кубыше"></div>
+  <div id="ring" class="abs"></div>
+  <svg id="sv" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg"></svg>
+  <div id="fog" class="abs"></div>
+  <div id="pushes"></div>
+  <div id="rew" class="abs">◀◀ 10 дней назад</div>
+  <div id="scan" class="abs"></div>
+  <div id="top" class="abs"></div>
+  <div id="cap" class="abs"></div>
+  <div id="chips"></div>
+  <div id="kub" class="abs"><svg id="kubSvg" viewBox="-130 -150 260 270" width="230" height="230" role="img" aria-label="Кубыш"></svg></div>
+  <div id="bubK" class="abs bub"></div>
+  <div id="bubM" class="abs bub mih"></div>
+  <div id="end" class="abs">
+    <img src="{{ICO}}" alt="Иконка Кубыша">
+    <h1>Кубыш</h1>
+    <p>Считает, хватит ли до получки</p>
+    <div class="cta">Скачай бесплатно в App Store</div>
+    <div class="sub">Комфортно сегодня, спокойно завтра</div>
+  </div>
+  <div id="flash" class="abs"></div>
+  <div id="bar" class="abs"></div>
+</div></div>
+<div id="ctrl"><button id="play" type="button">Пауза</button><input id="seek" type="range" min="0" max="27" step="0.01" value="0" aria-label="Перемотка"><span id="tc">0.0 с</span></div>
+
+<script>
+const D=27.0, $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
+const TEA=location.hash.includes('tea');
+const cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)), seg=(t,a,b)=>cl((t-a)/(b-a)), lerp=(a,b,k)=>a+(b-a)*k;
+const eout=x=>1-Math.pow(1-cl(x),3), eio=x=>{x=cl(x);return x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2}, back=x=>{x=cl(x)-1;return x*x*(2.8*x+1.8)+1};
+const inout=(t,a,b,fi=.3,fo=.25)=>Math.min(eout(seg(t,a,a+fi)),1-seg(t,b-fo,b));
+const show=(el,o)=>{el.style.opacity=o;el.style.visibility=o<=0.001?'hidden':'visible'};
+const hash=n=>{const x=Math.sin(n*127.1+311.7)*43758.5453;return x-Math.floor(x)};
+const P=(a,b,k)=>[lerp(a[0],b[0],k),lerp(a[1],b[1],k)];
+
+/* ---------- palette for the cartoon ---------- */
+const C={line:'#1d140e',skin:'#efb58f',skinD:'#d98f6c',nose:'#d6504a',hair:'#6b4423',hairD:'#4b2f18',blue:'#3c6db4',white:'#f1efe8',
+  wall:'#4a3b2c',wallD:'#2a2119',wood:'#93623a',woodD:'#5b3b20',floor:'#2c2a27',metal:'#7d8287',bulb:'#fff3c4'};
+
+/* ---------- build SVG ---------- */
+const FROG=`<g stroke="#1d140e" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+ <path d="M-95 70 C-120 0 -100 -70 -60 -88 L60 -88 C100 -70 120 0 95 70 C70 105 -70 105 -95 70Z" fill="#5fb84a"/>
+ <path d="M-60 40 C-60 0 60 0 60 40 C55 80 -55 80 -60 40Z" fill="#f2d675"/>
+ <circle cx="-48" cy="-92" r="38" fill="#5fb84a"/><circle cx="48" cy="-92" r="38" fill="#5fb84a"/>
+ <circle cx="-48" cy="-92" r="25" fill="#fff"/><circle cx="48" cy="-92" r="25" fill="#fff"/>
+ <circle class="fp" cx="-42" cy="-90" r="10" fill="#1a1a1a" stroke="none"/><circle class="fp" cx="54" cy="-90" r="10" fill="#1a1a1a" stroke="none"/>
+ <path d="M-74 -100 Q-48 -122 -22 -100 L-22 -110 Q-48 -134 -74 -110Z" fill="#4a9a3a"/><path d="M22 -100 Q48 -122 74 -100 L74 -110 Q48 -134 22 -110Z" fill="#4a9a3a"/>
+ <path class="fm" d="M-60 -38 Q0 -8 60 -38" fill="none"/>
+ <circle cx="-66" cy="-40" r="10" fill="#e2736a" stroke="none" opacity=".5"/><circle cx="66" cy="-40" r="10" fill="#e2736a" stroke="none" opacity=".5"/>
+ <circle cx="62" cy="38" r="34" fill="#f2c230"/><text x="62" y="51" font-family="Inter,sans-serif" font-weight="900" font-size="38" text-anchor="middle" fill="#8a5a00" stroke="none">₽</text>
+ <ellipse cx="34" cy="40" rx="20" ry="15" fill="#5fb84a"/><ellipse cx="-70" cy="40" rx="20" ry="15" fill="#5fb84a"/>
+ <ellipse cx="-50" cy="98" rx="34" ry="14" fill="#4a9a3a"/><ellipse cx="50" cy="98" rx="34" ry="14" fill="#4a9a3a"/></g>`;
+
+const sv=$('sv');
+sv.innerHTML=`
+<defs>
+  <pattern id="str" width="12" height="44" patternUnits="userSpaceOnUse"><rect width="12" height="44" fill="${C.white}"/><rect width="12" height="22" fill="${C.blue}"/></pattern>
+  <pattern id="plank" width="88" height="400" patternUnits="userSpaceOnUse"><rect width="88" height="400" fill="#a8703d"/><rect width="5" height="400" fill="#3b2412"/><path d="M30 20 q10 60 0 120 M60 180 q-8 50 4 110 M20 300 q6 40 -2 80" fill="none" stroke="#6b4422" stroke-width="3"/></pattern>
+  <pattern id="plankD" width="70" height="400" patternUnits="userSpaceOnUse"><rect width="70" height="400" fill="#7d5130"/><rect width="5" height="400" fill="#2e1c0e"/><path d="M28 40 q8 60 0 120 M48 220 q-6 50 3 100" fill="none" stroke="#5a3a1e" stroke-width="3"/></pattern>
+  <pattern id="gate" width="60" height="400" patternUnits="userSpaceOnUse"><rect width="60" height="400" fill="#5d7a8a"/><rect width="4" height="400" fill="#2f4250"/></pattern>
+  <linearGradient id="dusk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffcf8a"/><stop offset=".6" stop-color="#ff9a62"/><stop offset="1" stop-color="#e2674e"/></linearGradient>
+  <linearGradient id="duskL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb877" stop-opacity=".55"/><stop offset="1" stop-color="#ffb877" stop-opacity="0"/></linearGradient>
+  <pattern id="corr" width="60" height="10" patternUnits="userSpaceOnUse"><rect width="60" height="10" fill="${C.wall}"/><rect width="8" height="10" x="0" fill="#0000002e"/><rect width="5" height="10" x="30" fill="#ffffff10"/></pattern>
+  <pattern id="stub" width="11" height="10" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="2" fill="#2e211b" opacity=".7"/><circle cx="8.5" cy="7.5" r="1.8" fill="#2e211b" opacity=".65"/></pattern>
+  <radialGradient id="bglow"><stop offset="0" stop-color="#ffe9a8" stop-opacity=".75"/><stop offset=".35" stop-color="#ffcf70" stop-opacity=".25"/><stop offset="1" stop-color="#ffb84d" stop-opacity="0"/></radialGradient>
+  <radialGradient id="pglow"><stop offset="0" stop-color="#7fb7ff" stop-opacity=".5"/><stop offset="1" stop-color="#7fb7ff" stop-opacity="0"/></radialGradient>
+  <radialGradient id="gglow"><stop offset="0" stop-color="#3ecf86" stop-opacity=".75"/><stop offset="1" stop-color="#3ecf86" stop-opacity="0"/></radialGradient>
+  <linearGradient id="scr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#123326"/><stop offset="1" stop-color="#050b08"/></linearGradient>
+  <filter id="blur6"><feGaussianBlur stdDeviation="7"/></filter>
+  <filter id="blur2"><feGaussianBlur stdDeviation="2"/></filter>
+  <clipPath id="torsoClip"><path id="torsoP" d="M318 1260 C300 1010 330 830 420 778 Q540 738 660 778 C750 830 780 1010 762 1260 Z"/></clipPath>
+  <clipPath id="faceClip"><ellipse cx="540" cy="610" rx="132" ry="152"/></clipPath>
+  <clipPath id="screenClip"><rect x="-150" y="-300" width="300" height="600" rx="34"/></clipPath>
+</defs>
+<g id="front">
+  <rect width="1080" height="1920" fill="#7c7b77"/>
+  <polygon points="190,1250 890,1250 1080,1560 1080,1920 0,1920 0,1560" fill="#8e8d88" stroke="#1d140e" stroke-width="6"/>
+  <rect x="190" y="250" width="700" height="1000" fill="url(#plank)" stroke="#1d140e" stroke-width="6"/>
+  <!-- garage gates, slightly open -->
+  <g id="gates" stroke="#1d140e" stroke-width="6" stroke-linejoin="round">
+    <rect id="gap" x="490" y="340" width="100" height="910" fill="url(#dusk)" stroke="none"/>
+    <circle cx="540" cy="520" r="40" fill="#fff1c9" stroke="none" opacity=".9"/>
+    <polygon id="leafL" points="232,330 500,352 500,1250 232,1250" fill="url(#gate)"/>
+    <polygon id="leafR" points="580,352 848,330 848,1250 580,1250" fill="url(#gate)"/>
+    <path d="M250 430 L485 1150 M250 430 H485 M250 1150 H485 M595 1150 L830 430 M595 430 H830 M595 1150 H830" fill="none" stroke="#3a5262" stroke-width="16"/>
+    <rect x="470" y="760" width="16" height="70" rx="6" fill="#c9ccd0"/><rect x="594" y="760" width="16" height="70" rx="6" fill="#c9ccd0"/>
+    <rect x="236" y="400" width="30" height="16" fill="#2a2a2a"/><rect x="236" y="1150" width="30" height="16" fill="#2a2a2a"/><rect x="814" y="400" width="30" height="16" fill="#2a2a2a"/><rect x="814" y="1150" width="30" height="16" fill="#2a2a2a"/>
+    <rect x="226" y="324" width="628" height="928" fill="none" stroke-width="10"/>
+  </g>
+  <polygon id="spill" points="490,1250 590,1250 830,1920 250,1920" fill="url(#duskL)"/>
+  <!-- ceiling + side walls -->
+  <polygon points="0,0 1080,0 890,250 190,250" fill="#5b3a20" stroke="#1d140e" stroke-width="6"/><line x1="30" y1="40" x2="1050" y2="40" stroke="#2e1c0e" stroke-width="7"/><line x1="84" y1="110" x2="996" y2="110" stroke="#2e1c0e" stroke-width="7"/><line x1="133" y1="175" x2="947" y2="175" stroke="#2e1c0e" stroke-width="7"/><line x1="175" y1="230" x2="905" y2="230" stroke="#2e1c0e" stroke-width="7"/>
+  <polygon points="0,0 190,250 190,1250 0,1560" fill="url(#plankD)" stroke="#1d140e" stroke-width="6"/>
+  <polygon points="1080,0 890,250 890,1250 1080,1560" fill="url(#plankD)" stroke="#1d140e" stroke-width="6"/>
+  <polygon points="0,0 190,250 190,1250 0,1560" fill="#000" opacity=".22"/><polygon points="1080,0 890,250 890,1250 1080,1560" fill="#000" opacity=".22"/>
+  <g transform="translate(40 820) skewY(28)" stroke="#1d140e" stroke-width="4"><rect width="120" height="150" fill="#efe7d6"/><rect width="120" height="34" fill="#c0392b"/>
+    <text x="60" y="24" font-family="Inter,sans-serif" font-weight="800" font-size="18" text-anchor="middle" fill="#fff" stroke="none">ОКТЯБРЬ</text><circle cx="88" cy="110" r="20" fill="none" stroke="#c0392b" stroke-width="4"/>
+    <text x="88" y="118" font-family="Inter,sans-serif" font-weight="800" font-size="22" text-anchor="middle" fill="#222" stroke="none">25</text></g>
+  <g transform="translate(905 560) skewY(-28)" stroke="#1d140e" stroke-width="4"><rect width="150" height="16" fill="#5b3b20"/><rect x="10" y="-70" width="40" height="70" rx="6" fill="#8a3b2e"/><rect x="62" y="-52" width="34" height="52" rx="5" fill="#c9a23f"/><rect x="106" y="-60" width="34" height="60" rx="5" fill="#4c6a4a"/></g>
+  <g stroke="#1d140e" stroke-width="6"><ellipse cx="985" cy="1470" rx="80" ry="110" fill="#222"/><ellipse cx="985" cy="1470" rx="34" ry="50" fill="#555"/></g>
+  <ellipse id="pool" cx="540" cy="1760" rx="400" ry="95" fill="#fff0b8" opacity=".25"/>
+  <polygon id="cone" points="0,0 0,0 0,0" fill="#ffe7a0" opacity=".35"/>
+  <circle id="glowF" r="460" fill="url(#bglow)"/>
+  <g id="person" transform="translate(0 120)">
+  <!-- Mikhalych -->
+  <g id="mih">
+    <g id="torso"><path d="M318 1260 C300 1010 330 830 420 778 Q540 738 660 778 C750 830 780 1010 762 1260 Z" fill="url(#str)" stroke="${C.line}" stroke-width="7"/>
+      <g clip-path="url(#torsoClip)" fill="#8f8a7d" opacity=".55"><ellipse cx="450" cy="930" rx="22" ry="14"/><ellipse cx="640" cy="1010" rx="18" ry="26"/><ellipse cx="560" cy="1120" rx="26" ry="12"/></g>
+      <path d="M470 772 L540 860 L610 772" fill="${C.skin}" stroke="${C.line}" stroke-width="6"/></g>
+    <g id="head">
+      <ellipse cx="410" cy="620" rx="26" ry="38" fill="${C.skin}" stroke="${C.line}" stroke-width="6"/>
+      <ellipse cx="670" cy="620" rx="26" ry="38" fill="${C.skin}" stroke="${C.line}" stroke-width="6"/>
+      <path d="M408 600 C405 470 470 445 540 445 C610 445 675 470 672 600 C676 700 640 770 540 772 C440 770 404 700 408 600Z" fill="${C.skin}" stroke="${C.line}" stroke-width="7"/>
+      <path d="M430 690 C450 755 500 770 540 770 C580 770 630 755 650 690 C640 735 600 745 540 745 C480 745 440 735 430 690Z" fill="url(#stub)"/>
+      <path d="M420 680 C440 760 640 760 660 680 C650 740 600 760 540 762 C480 760 430 740 420 680Z" fill="url(#stub)"/>
+      <path d="M470 770 Q540 805 610 770" fill="none" stroke="${C.line}" stroke-width="5"/><circle cx="465" cy="665" r="30" fill="#e2736a" opacity=".45"/><circle cx="615" cy="665" r="30" fill="#e2736a" opacity=".45"/>
+      <g id="eyes">
+        <ellipse cx="490" cy="600" rx="27" ry="21" fill="#fff" stroke="${C.line}" stroke-width="5"/><ellipse cx="590" cy="600" rx="27" ry="21" fill="#fff" stroke="${C.line}" stroke-width="5"/>
+        <circle id="pupL" cx="490" cy="602" r="9" fill="#1a1a1a"/><circle id="pupR" cx="590" cy="602" r="9" fill="#1a1a1a"/>
+        <path id="lidL" fill="${C.skinD}" stroke="${C.line}" stroke-width="5"/><path id="lidR" fill="${C.skinD}" stroke="${C.line}" stroke-width="5"/>
+        <path d="M462 626 q28 18 56 0 M562 626 q28 18 56 0" fill="#c98374" fill-opacity=".55" stroke="#9b544a" stroke-width="4"/><path d="M466 640 q24 10 48 0 M566 640 q24 10 48 0" fill="none" stroke="#b5655a" stroke-width="3"/>
+      </g>
+      <path id="browL" fill="none" stroke="${C.hairD}" stroke-width="13" stroke-linecap="round"/><path id="browR" fill="none" stroke="${C.hairD}" stroke-width="13" stroke-linecap="round"/>
+      <ellipse cx="540" cy="652" rx="36" ry="30" fill="${C.nose}" stroke="${C.line}" stroke-width="6"/><ellipse cx="528" cy="640" rx="10" ry="7" fill="#fff" opacity=".45"/>
+      <path id="mouth" fill="#5a1f1a" stroke="${C.line}" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M402 600 C385 560 395 500 425 478 C430 520 440 545 452 560 C440 575 425 590 418 610Z" fill="${C.hair}" stroke="${C.line}" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M678 600 C695 560 685 500 655 478 C650 520 640 545 628 560 C640 575 655 590 662 610Z" fill="${C.hair}" stroke="${C.line}" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M500 452 C510 420 540 405 552 440 M540 450 C560 410 600 415 590 455 M470 470 C470 440 495 430 505 455" fill="none" stroke="${C.hair}" stroke-width="9" stroke-linecap="round"/>
+      <path d="M470 505 q70 -18 140 0 M485 528 q55 -12 110 0" fill="none" stroke="#c98a68" stroke-width="5" stroke-linecap="round"/>
+      <ellipse cx="555" cy="480" rx="26" ry="12" fill="#fff" opacity=".35"/>
+      <ellipse id="faceGlow" cx="540" cy="640" rx="150" ry="140" fill="url(#pglow)" opacity=".5"/>
+    </g>
+  </g>
+  <!-- stool -->
+  <g stroke="#1d140e" stroke-width="6"><rect x="340" y="1262" width="400" height="34" rx="10" fill="#8a5a32"/><path d="M370 1296 L340 1580 M710 1296 L740 1580" stroke="#5b3b20" stroke-width="22"/></g>
+  <!-- legs under the table -->
+  <g stroke="#1d140e" stroke-width="6">
+    <path d="M420 1250 L410 1555 L505 1555 L520 1250Z" fill="#4f6f99"/><path d="M560 1250 L575 1555 L670 1555 L660 1250Z" fill="#4f6f99"/>
+    <path d="M430 1380 q20 10 40 0 M590 1420 q20 10 40 0" fill="none" stroke="#3a5478" stroke-width="5"/>
+    <g id="slipL"><path d="M385 1590 C380 1550 520 1545 525 1585 C525 1610 390 1615 385 1590Z" fill="#9a9a94"/><path d="M400 1570 q55 -22 110 0" fill="none" stroke="#6f6f69" stroke-width="5"/></g>
+    <g id="slipR"><path d="M555 1585 C560 1545 700 1550 695 1590 C690 1615 555 1610 555 1585Z" fill="#9a9a94"/><path d="M570 1570 q55 -22 110 0" fill="none" stroke="#6f6f69" stroke-width="5"/></g>
+  </g>
+  <!-- table on legs -->
+  <g stroke="#1d140e" stroke-width="6"><rect x="215" y="1238" width="22" height="370" fill="#3b3d40"/><rect x="843" y="1238" width="22" height="370" fill="#3b3d40"/>
+    <rect x="300" y="1238" width="18" height="300" fill="#2c2e31"/><rect x="762" y="1238" width="18" height="300" fill="#2c2e31"/>
+    <rect x="190" y="1200" width="700" height="42" fill="#b07a45"/><path d="M220 1214 h180 M480 1226 h220" stroke="#7a4f28" stroke-width="3"/></g>
+  <g id="ashtray" stroke="${C.line}" stroke-width="5"><ellipse cx="250" cy="1198" rx="80" ry="22" fill="#8c9196"/><ellipse cx="250" cy="1192" rx="60" ry="14" fill="#5b5f63"/>
+    <rect x="215" y="1180" width="42" height="9" rx="4" fill="#efe7d6" transform="rotate(-12 236 1184)"/><rect x="255" y="1182" width="36" height="9" rx="4" fill="#efe7d6" transform="rotate(15 273 1186)"/></g>
+  <g id="jar" transform="translate(-140 0)" stroke="${C.line}" stroke-width="5"><rect x="830" y="1040" width="140" height="165" rx="20" fill="#cfe6ec" fill-opacity=".35"/><rect x="822" y="1028" width="156" height="26" rx="8" fill="#8c9196"/>
+    <rect x="842" y="1090" width="116" height="44" rx="6" fill="#efe7d6"/><text x="900" y="1121" font-family="Inter,sans-serif" font-weight="800" font-size="22" text-anchor="middle" fill="#222" stroke="none">НА ОТПУСК</text>
+    <ellipse cx="900" cy="1192" rx="16" ry="6" fill="#d9b43a"/><path d="M835 1058 l50 60 M835 1080 l30 0 M850 1058 l-5 40" stroke="#ddd" stroke-width="2" fill="none"/></g>
+  <g id="kubTable">${FROG}</g>
+  <!-- arms -->
+  <g id="armL"><g id="uL"><rect x="-38" y="-12" width="76" height="200" rx="36" fill="url(#str)" stroke="${C.line}" stroke-width="6"/></g>
+    <g id="fL"><rect x="-34" y="-12" width="68" height="190" rx="32" fill="url(#str)" stroke="${C.line}" stroke-width="6"/></g>
+    <g id="hL"><g id="cig"><rect x="10" y="-6" width="58" height="12" rx="5" fill="#f4efe2" stroke="${C.line}" stroke-width="4"/><rect x="10" y="-6" width="16" height="12" rx="4" fill="#d58b3a" stroke="${C.line}" stroke-width="4"/><circle id="ember" cx="68" cy="0" r="6" fill="#ff6a2a"/></g>
+      <g id="mug"><rect x="-10" y="-70" width="84" height="96" rx="14" fill="#c94f3b" stroke="${C.line}" stroke-width="6"/><path d="M74 -50 q34 6 0 40" fill="none" stroke="${C.line}" stroke-width="10"/><path d="M74 -50 q34 6 0 40" fill="none" stroke="#c94f3b" stroke-width="4"/></g>
+      <circle r="38" fill="${C.skin}" stroke="${C.line}" stroke-width="6"/><path d="M-10 -30 q20 -14 30 6" fill="none" stroke="${C.line}" stroke-width="5"/><path d="M-22 4 h26 M-22 18 h22" stroke="${C.line}" stroke-width="4"/></g></g>
+  <g id="armR"><g id="uR"><rect x="-38" y="-12" width="76" height="200" rx="36" fill="url(#str)" stroke="${C.line}" stroke-width="6"/></g>
+    <g id="fR"><rect x="-34" y="-12" width="68" height="190" rx="32" fill="url(#str)" stroke="${C.line}" stroke-width="6"/></g>
+    <g id="hR"><rect x="-58" y="-120" width="116" height="210" rx="20" fill="#24282c" stroke="${C.line}" stroke-width="6"/><circle cx="-28" cy="-90" r="12" fill="#111" stroke="#555" stroke-width="3"/>
+      <rect id="phoneEdge" x="-58" y="-120" width="116" height="210" rx="20" fill="none" stroke="#3ecf86" stroke-width="0"/>
+      <circle r="40" cy="40" fill="${C.skin}" stroke="${C.line}" stroke-width="6"/><path d="M-30 30 h40 M-30 48 h36" stroke="${C.line}" stroke-width="4"/></g></g>
+  <g id="smoke" filter="url(#blur6)"></g>
+  </g>
+  <!-- bulb + fly -->
+  <g id="bulbG"><line id="cord" stroke="#1a1a1a" stroke-width="6"/><g id="bulb"><rect x="-22" y="-10" width="44" height="40" rx="6" fill="#6f6a60" stroke="${C.line}" stroke-width="5"/><circle cx="0" cy="62" r="40" fill="${C.bulb}" stroke="${C.line}" stroke-width="5"/><circle cx="-12" cy="52" r="10" fill="#fff"/></g></g>
+  <g id="fly"><ellipse id="wing1" cx="-6" cy="-8" rx="9" ry="14" fill="#cfe3ff" fill-opacity=".75" stroke="#222" stroke-width="2"/><ellipse id="wing2" cx="6" cy="-8" rx="9" ry="14" fill="#cfe3ff" fill-opacity=".75" stroke="#222" stroke-width="2"/><ellipse rx="11" ry="8" fill="#1a1a1a"/><circle cx="9" cy="-2" r="4" fill="#8b1d1d"/></g>
+</g>
+
+<g id="back">
+  <rect width="1080" height="1300" fill="url(#plank)"/><polygon points="0,0 1080,0 1080,120 0,120" fill="#5b3a20"/>
+  <circle id="glowB" cx="540" cy="300" r="520" fill="url(#bglow)"/>
+  <line x1="540" y1="0" x2="540" y2="230" stroke="#1a1a1a" stroke-width="6"/>
+  <g transform="translate(540 230)"><rect x="-22" y="-10" width="44" height="40" rx="6" fill="#6f6a60" stroke="${C.line}" stroke-width="5"/><circle cx="0" cy="62" r="40" fill="${C.bulb}" stroke="${C.line}" stroke-width="5"/></g>
+  <g stroke="${C.line}" stroke-width="5"><rect x="760" y="560" width="270" height="300" fill="#6d5b44"/><path d="M900 600 l40 180" stroke="#9aa0a6" stroke-width="16"/></g>
+  <path d="M-40 1180 L1120 1180 L1120 1920 L-40 1920Z" fill="${C.wood}" stroke="${C.line}" stroke-width="6"/>
+  <path d="M-40 1400 H1120 M-40 1620 H1120" stroke="${C.woodD}" stroke-width="6"/>
+  <g stroke="${C.line}" stroke-width="5"><ellipse cx="170" cy="1290" rx="110" ry="32" fill="#8c9196"/><ellipse cx="170" cy="1282" rx="82" ry="20" fill="#5b5f63"/></g>
+  <g stroke="${C.line}" stroke-width="5"><rect x="880" y="1030" width="150" height="180" rx="22" fill="#cfe6ec" fill-opacity=".35"/><rect x="872" y="1018" width="166" height="26" rx="8" fill="#8c9196"/></g>
+  <!-- shoulders and head from behind -->
+  <path d="M-80 1920 L-80 1600 C-60 1460 120 1400 300 1390 L560 1390 C760 1400 940 1450 1000 1600 L1020 1920Z" fill="url(#str)" stroke="${C.line}" stroke-width="8"/>
+  <path d="M350 1395 C360 1350 500 1350 510 1395" fill="${C.skin}" stroke="${C.line}" stroke-width="6"/>
+  <ellipse cx="255" cy="1210" rx="34" ry="52" fill="${C.skin}" stroke="${C.line}" stroke-width="7"/><ellipse cx="605" cy="1210" rx="34" ry="52" fill="${C.skin}" stroke="${C.line}" stroke-width="7"/>
+  <ellipse cx="430" cy="1190" rx="180" ry="200" fill="${C.hair}" stroke="${C.line}" stroke-width="8"/>
+  <path d="M260 1280 C300 1380 560 1380 600 1280 C580 1340 300 1345 260 1280Z" fill="${C.skin}" opacity=".9"/>
+  <ellipse cx="435" cy="1075" rx="130" ry="105" fill="${C.skin}" stroke="${C.line}" stroke-width="6"/><ellipse cx="400" cy="1040" rx="40" ry="20" fill="#fff" opacity=".5"/><path d="M380 1000 q20 -30 40 0 M460 990 q15 -28 35 2" fill="none" stroke="${C.hair}" stroke-width="8" stroke-linecap="round"/>
+  <path d="M290 1100 l-30 -20 M330 1030 l-20 -40 M560 1040 l30 -30 M600 1120 l40 -10 M380 1000 l-5 -35 M510 1000 l12 -35" stroke="${C.line}" stroke-width="7" stroke-linecap="round"/>
+  <!-- right forearm + phone -->
+  <g transform="translate(895 1560) rotate(160)"><rect x="-50" y="-10" width="100" height="520" rx="46" fill="url(#str)" stroke="${C.line}" stroke-width="7"/></g>
+  <g id="bphone" transform="translate(700 800) rotate(-5)">
+    <rect x="-165" y="-320" width="330" height="640" rx="48" fill="#1b1e21" stroke="${C.line}" stroke-width="8"/>
+    <g clip-path="url(#screenClip)"><rect x="-150" y="-300" width="300" height="600" fill="url(#scr)"/>
+      <circle id="scrGlow" cx="0" cy="-20" r="200" fill="url(#gglow)"/>
+      <g id="scrIcon"><g transform="translate(0 -10) scale(.62)">${FROG}</g></g>
+      <text id="scrTxt" x="0" y="110" font-family="Inter,sans-serif" font-weight="800" font-size="34" text-anchor="middle" fill="#3ecf86">Кубыш</text></g>
+    <rect x="-150" y="-300" width="300" height="600" rx="34" fill="none" stroke="#000" stroke-width="3"/>
+    <rect x="-40" y="-290" width="80" height="20" rx="10" fill="#000"/>
+  </g>
+  <g stroke="${C.line}" stroke-width="7" fill="${C.skin}">
+    <ellipse cx="735" cy="1125" rx="105" ry="72" transform="rotate(-20 735 1125)"/>
+    <ellipse cx="545" cy="930" rx="34" ry="24"/><ellipse cx="538" cy="985" rx="36" ry="25"/><ellipse cx="540" cy="1040" rx="34" ry="24"/><ellipse cx="555" cy="1090" rx="30" ry="22"/>
+    <ellipse cx="858" cy="1000" rx="30" ry="56" transform="rotate(20 858 1000)"/></g>
+  <g id="flyB"><ellipse id="wb1" cx="-6" cy="-8" rx="9" ry="14" fill="#cfe3ff" fill-opacity=".75" stroke="#222" stroke-width="2"/><ellipse id="wb2" cx="6" cy="-8" rx="9" ry="14" fill="#cfe3ff" fill-opacity=".75" stroke="#222" stroke-width="2"/><ellipse rx="11" ry="8" fill="#1a1a1a"/></g>
+</g>`;
+$('kubSvg').innerHTML=FROG;
+$('cig').style.display=TEA?'none':''; $('mug').style.display=TEA?'':'none';
+const SMOKE=$('smoke'), pool=[];
+for(let i=0;i<90;i++){const c=document.createElementNS(NS,'circle');c.setAttribute('fill','#e8e4dc');SMOKE.appendChild(c);pool.push(c)}
+
+/* ---------- character rig ---------- */
+const SH_L=[400,815], SH_R=[680,815], UA=185, FA=175;
+const MOUTH=[540,712], REST_L=[372,1170], PHONE=[650,1010];
+function ik(S,T,side){let dx=T[0]-S[0],dy=T[1]-S[1],d=Math.hypot(dx,dy);d=Math.min(d,UA+FA-2);d=Math.max(d,Math.abs(UA-FA)+2);
+  const phi=Math.atan2(dy,dx),al=Math.acos(cl((UA*UA+d*d-FA*FA)/(2*UA*d),-1,1));
+  const e1=[S[0]+UA*Math.cos(phi+al),S[1]+UA*Math.sin(phi+al)],e2=[S[0]+UA*Math.cos(phi-al),S[1]+UA*Math.sin(phi-al)];
+  const E=side<0?(e1[0]<e2[0]?e1:e2):(e1[0]>e2[0]?e1:e2);
+  const H=[E[0]+FA*Math.cos(Math.atan2(T[1]-E[1],T[0]-E[0])),E[1]+FA*Math.sin(Math.atan2(T[1]-E[1],T[0]-E[0]))];return [E,H]}
+const segT=(A,B)=>`translate(${A[0]} ${A[1]}) rotate(${Math.atan2(B[1]-A[1],B[0]-A[0])*180/Math.PI-90})`;
+// pose keys: [t, target]
+function track(keys,t){if(t<=keys[0][0])return keys[0][1];for(let i=1;i<keys.length;i++){if(t<keys[i][0]){const a=keys[i-1],b=keys[i];return P(a[1],b[1],eio((t-a[0])/(b[0]-a[0])))}}return keys[keys.length-1][1]}
+const HEAD=[470,470], WAVE=[300,900], CHEST=[520,930];
+const LKEYS=[[0,REST_L],[0.25,REST_L],[0.65,MOUTH],[1.3,MOUTH],[1.8,REST_L],[4.7,REST_L],[5.1,WAVE],[6.0,WAVE],[6.4,HEAD],[7.3,HEAD],[7.7,MOUTH],[8.7,MOUTH],[9.2,REST_L],
+  [19.0,REST_L],[19.3,CHEST],[20.5,CHEST],[20.9,REST_L],[27,REST_L]];
+function handL(t){let h=track(LKEYS,t);
+  if(t>5.1&&t<6.0)h=[h[0]+45*Math.sin((t-5.1)*14),h[1]+10*Math.cos((t-5.1)*14)];
+  if(t>6.4&&t<7.3)h=[h[0]+14*Math.sin((t-6.4)*22),h[1]+6*Math.cos((t-6.4)*22)];
+  return h}
+function handR(t){let h=PHONE;if(t>=19)h=P(PHONE,[700,1120],eio(seg(t,19,19.6)));
+  h=[h[0]+3*Math.sin(t*1.7),h[1]+4*Math.sin(t*2.3)];
+  if(t>2.6&&t<6.0){const k=(t-2.6)%0.65;if(k<0.12)h=[h[0],h[1]-8]}           // taps on phone
+  if(t>9.05&&t<9.6)h=[h[0]+7*Math.sin(t*90),h[1]];                           // vibration
+  return h}
+function tipAt(b){const h=handL(b);return TEA?[h[0]+32,h[1]-72]:[h[0]+62,h[1]-8]}
+const atMouth=t=>Math.hypot(handL(t)[0]-MOUTH[0],handL(t)[1]-MOUTH[1])<40;
+const exhaleW=[[1.35,2.4,1],[8.75,9.7,2.4]];
+
+function bulbPos(t){const th=(6*Math.sin(t*1.25)+2*Math.sin(t*2.9))*Math.PI/180,L=150;return [540+L*Math.sin(th),250+L*Math.cos(th),th]}
+function flyPos(t){const b=bulbPos(t);let x=b[0]+120*Math.cos(t*2.6)+28*Math.sin(t*7.1),y=b[1]+70+55*Math.sin(t*4.1)+18*Math.cos(t*9.3);
+  if(t>=20.9){const k=eio(seg(t,20.9,21.5));const n=[540,748];x=lerp(x,n[0],k)+(1-k)*30*Math.sin(t*12);y=lerp(y,n[1],k)}
+  return [x,y]}
+window.flyPos=flyPos;
+
+function drawFront(t){
+  // torso breathing, head motion
+  const br=1+0.012*Math.sin(t*2.1);
+  $('torso').setAttribute('transform',`translate(540 1260) scale(1 ${br}) translate(-540 -1260)`);
+  let tilt=2*Math.sin(t*1.1); if(t>6.4&&t<7.3)tilt+=6; if(t>=19)tilt=-3+1.5*Math.sin(t*1.3);
+  const hy=(br-1)*-500 + (atMouth(t)?4:0);
+  $('head').setAttribute('transform',`translate(0 ${hy}) rotate(${tilt} 540 760)`);
+  // eyes
+  let look=[7,9]; if(t>5.6&&t<7.6)look=[-4,-10]; if(t>=19)look=[0,0]; if(t>=21.4){look=null}
+  const pl=$('pupL'),pr=$('pupR');
+  if(look){pl.setAttribute('cx',490+look[0]);pl.setAttribute('cy',602+look[1]);pr.setAttribute('cx',590+look[0]);pr.setAttribute('cy',602+look[1])}
+  else{pl.setAttribute('cx',504);pl.setAttribute('cy',606);pr.setAttribute('cx',576);pr.setAttribute('cy',606)}  // cross-eyed at the fly
+  let lid=t>=19?0.25:0.48; if(t>=21.4)lid=0.05; if(((t+0.4)%3.3)<0.13)lid=1;
+  const lidPath=(cx)=>{const y0=579,y1=y0+lid*42;return `M${cx-30} ${y0+6} Q${cx} ${y0-14} ${cx+30} ${y0+6} L${cx+30} ${y1} Q${cx} ${y1+6} ${cx-30} ${y1} Z`};
+  $('lidL').setAttribute('d',lidPath(490));$('lidR').setAttribute('d',lidPath(590));
+  // brows: worried until 19
+  const w=t<19?1:-0.4, wb=t>=21.4?-1:w;
+  $('browL').setAttribute('d',`M458 ${562+8*wb} Q485 ${548} 515 ${556-10*wb}`);
+  $('browR').setAttribute('d',`M565 ${556-10*wb} Q595 ${548} 622 ${562+8*wb}`);
+  // mouth
+  let m='frown';
+  if(atMouth(t))m=TEA?'sip':'purse';
+  if(!TEA&&exhaleW.some(e=>t>e[0]&&t<e[1]-0.3))m='o';
+  if(t>19.25&&t<20.6)m=(Math.floor(t*9)%2)?'talk':'smile';
+  if(t>=20.6)m='smile'; if(t>=21.4)m='o';
+  const MO={frown:'M505 722 Q540 704 575 722 Q540 714 505 722Z',purse:'M528 712 Q540 704 552 712 Q540 722 528 712Z',sip:'M520 716 Q540 710 560 716 Q540 722 520 716Z',
+    o:'M524 712 Q540 694 556 712 Q540 734 524 712Z',talk:'M505 708 Q540 700 575 708 Q540 744 505 708Z',smile:'M500 706 Q540 724 580 706 Q540 746 500 706Z'};
+  $('mouth').setAttribute('d',MO[m]);
+  // face light from phone: blue until 9, green flash 9.05–9.6
+  const fg=$('faceGlow'); fg.setAttribute('fill',t>9.05&&t<9.7?'url(#gglow)':'url(#pglow)'); fg.setAttribute('opacity',t>=19?0:(t>9.05&&t<9.7?0.8:0.45));
+  $('phoneEdge').setAttribute('stroke-width',t>9.05&&t<9.7?10:0);
+  // arms
+  const HL=handL(t),HR=handR(t);
+  let [E,H]=ik(SH_L,HL,-1);
+  $('uL').setAttribute('transform',segT(SH_L,E));$('fL').setAttribute('transform',segT(E,H));
+  const ang=Math.atan2(H[1]-E[1],H[0]-E[0])*180/Math.PI;
+  $('hL').setAttribute('transform',`translate(${H[0]} ${H[1]}) rotate(${TEA?0:(atMouth(t)?-10:ang-80)})`);
+  [E,H]=ik(SH_R,HR,1);
+  $('uR').setAttribute('transform',segT(SH_R,E));$('fR').setAttribute('transform',segT(E,H));
+  $('hR').setAttribute('transform',`translate(${H[0]} ${H[1]}) rotate(${t>=19?-70*eio(seg(t,19,19.6)):-8})`);
+  $('ember').setAttribute('r',atMouth(t)?9:5+Math.sin(t*9));
+  // bulb + glow
+  const b=bulbPos(t); $('cord').setAttribute('x1',540);$('cord').setAttribute('y1',250);$('cord').setAttribute('x2',b[0]);$('cord').setAttribute('y2',b[1]-10);
+  $('bulb').setAttribute('transform',`translate(${b[0]} ${b[1]}) rotate(${-b[2]*180/Math.PI})`);
+  let fl=1; if(t>8.0&&t<9.6)fl=0.55+0.45*(hash(Math.floor(t*14))>0.35?1:0.2);
+  $('glowF').setAttribute('cx',b[0]);$('glowF').setAttribute('cy',b[1]+62);$('glowF').setAttribute('opacity',0.9*fl);
+  $('cone').setAttribute('points',`${b[0]-30},${b[1]+80} ${b[0]+30},${b[1]+80} ${b[0]+420},1330 ${b[0]-420},1330`);$('cone').setAttribute('opacity',0.45*fl);$('pool').setAttribute('opacity',0.28*fl);
+  // fly
+  const f=flyPos(t), wf=Math.floor(t*60)%2?0.35:1; const fx=f[0], fy=f[1];
+  $('fly').setAttribute('transform',`translate(${fx} ${fy}) scale(1.3) rotate(${15*Math.sin(t*7)})`);
+  $('wing1').setAttribute('ry',14*(t>=21.5?0.6:wf));$('wing2').setAttribute('ry',14*(t>=21.5?0.6:wf));
+  const tap=t<7.6?Math.max(0,Math.sin(t*14))*10:0; $('slipR').setAttribute('transform',`rotate(${-tap} 560 1595)`);
+  // Kubysh on table (final)
+  const kt=$('kubTable'),kk=back(seg(t,20.6,20.95));kt.setAttribute('transform',`translate(740 1060) scale(${t>=20.6?kk*0.8:0.001}) rotate(${Math.sin(t*6)*4})`);
+  // smoke / steam particles
+  let n=0; const put=(x,y,r,o)=>{if(n>=pool.length)return;const c=pool[n++];c.setAttribute('cx',x);c.setAttribute('cy',y);c.setAttribute('r',r);c.setAttribute('opacity',o)};
+  const WL=1.7;
+  for(let b0=Math.floor((t-WL)/0.09)*0.09;b0<=t;b0+=0.09){if(b0<0||(b0>9.7&&b0<19)||b0>23)continue;const a=t-b0;const p=tipAt(b0);const k=a/WL;
+    put(p[0]+18*Math.sin(b0*9+a*3)+a*10,p[1]-a*120,6+a*22,(TEA?0.4:0.32)*(1-k))}
+  if(!TEA)for(const [a0,a1,big] of exhaleW){for(let b0=a0;b0<a1-0.3;b0+=0.05){if(b0>t)break;const a=t-b0;if(a>2.4)continue;
+    const r1=hash(b0*13),r2=hash(b0*7+1);put(MOUTH[0]+(r1-0.5)*80*big+a*(r1-0.5)*160*big,MOUTH[1]-a*(70+90*r2)*big+10,(14+a*40)*big,0.55*(1-a/2.4))}}
+  for(;n<pool.length;n++)pool[n].setAttribute('opacity',0);
+}
+function drawBack(t,z){
+  const f=flyPos(t), b=[540,230];  // fly around the bulb in back view, same rhythm
+  const fx=b[0]+(f[0]-bulbPos(t)[0]), fy=b[1]+(f[1]-bulbPos(t)[1]);
+  $('flyB').setAttribute('transform',`translate(${fx} ${fy})`); const wf=Math.floor(t*60)%2?0.35:1;$('wb1').setAttribute('ry',14*wf);$('wb2').setAttribute('ry',14*wf);
+  const ip=back(seg(t,10.7,11.1)); $('scrIcon').setAttribute('transform',`translate(0 ${-30*ip}) scale(${1+0.35*ip})`);
+  $('scrTxt').setAttribute('opacity',1-ip); $('scrGlow').setAttribute('opacity',0.7+0.3*Math.sin(t*5));
+}
+
+/* ---------- overlays (captions, pushes, app scene) ---------- */
+function words(el,txt,t0,t,cls='hl'){
+  if(el.dataset.k!==txt){el.dataset.k=txt;let on=false;el.innerHTML=txt.split(' ').map(w=>{let a=on||w.startsWith('*');if(w.startsWith('*'))on=true;if(w.endsWith('*'))on=false;w=w.replace(/\*/g,'');return `<span class="w${a?' '+cls:''}">${w}</span>`}).join('')}
+  [...el.children].forEach((s,i)=>{const k=back(seg(t,t0+i*0.07,t0+i*0.07+0.22));s.style.opacity=cl(k*1.4);s.style.transform=`scale(${0.6+0.4*k})`});
+}
+const CAPS=[[0.25,2.6,'Хватит или *нет?*','red'],[2.9,5.6,TEA?'Ну семечки, ну огурчики, ну *по мелочи*':'Ну бутылочка, ну сиги, ну *по мелочи*'],[5.6,7.6,'А сколько осталось, *непонятно*','red'],
+  [8.55,9.6,'как *в тумане*'],[15.6,18.9,'Каждый день знаешь, сколько *можно сегодня*','grn']];
+const TOPS=[[0.0,2.6,'Я, когда до получки 5 дней'],[7.9,9.6,'Жизнь без плана']];
+const PUSH=TEA?[['🛒','Магазин у дома','Чипсы и семечки','−410 ₽',3.0],['🥒','Огурцы малосольные','Рынок','−320 ₽',3.65],['🛒','Магазин у дома','Еще по мелочи','−560 ₽',4.3],['🥒','Огурцы малосольные','Рынок, еще банка','−320 ₽',4.95],['🛒','Магазин у дома','Ну очень нужно','−780 ₽',5.6]]
+ :[['🍾','Бутылочка','Магазин у дома','−690 ₽',3.0],['🚬','Сиги','Ларек','−250 ₽',3.65],['🥒','Огурцы малосольные','Рынок','−320 ₽',4.3],['🍾','Еще бутылочка','Магазин у дома','−690 ₽',4.95],['🚬','Сиги','Ларек','−250 ₽',5.6]];
+const CHIPS=[[16.6,'До получки хватает','',1290],[17.3,'≈4 800 ₽ в день','blu',1400]];
+const pushes=$('pushes'), chips=$('chips');
+PUSH.forEach(p=>{const d=document.createElement('div');d.className='abs push';d.innerHTML=`<div class="ic">${p[0]}</div><div class="t">${p[1]}<small>${p[2]}</small></div><div class="s">${p[3]}</div>`;pushes.appendChild(d)});
+CHIPS.forEach(c=>{const d=document.createElement('div');d.className='abs chip '+c[2];d.textContent=c[1];d.style.top=c[3]+'px';chips.appendChild(d)});
+
+function render(t){
+  const front=$('front'),bk=$('back');
+  const inFront=t<10.1||(t>=19&&t<23)||t>=26.6, inBack=t>=9.6&&t<13.6, inApp=t>=13.2&&t<19.4, inEnd=t>=22.9;
+  // camera for front shot
+  let s=1,cx=540,cy=820,dx=0,rot=0,filt='';
+  if(t<2.6){s=1.06+0.06*seg(t,0,2.6)}
+  else if(t<7.6){s=1.02;filt='sepia(.6) saturate(1.25) brightness(1.05)'}
+  else if(t<9.6){s=1.04+0.14*eio(seg(t,7.6,9.0));cy=lerp(820,700,seg(t,7.6,9.0))}
+  else if(t<10.1){const k=eio(seg(t,9.6,10.1));s=1.18+0.3*k;dx=-1500*k;rot=-8*k;cy=700}
+  else {s=1.0+0.05*seg(t,19,23)}
+  front.setAttribute('transform',`translate(${540+dx} ${cy}) rotate(${rot}) scale(${s}) translate(${-540} ${-cy})`);
+  front.style.display=inFront?'':'none';
+  if(inFront)drawFront(t);
+  // back shot: whip in, then zoom into the phone screen
+  if(inBack){const w=eio(seg(t,9.6,10.1)),k=eio(seg(t,10.15,12.6));
+    const z=lerp(1,3.15,k),px=lerp(540,700,k),py=lerp(960,800,k);
+    bk.setAttribute('transform',`translate(${540+1500*(1-w)} 960) rotate(${8*(1-w)+5*k}) scale(${z}) translate(${-px} ${-py})`);
+    bk.style.display='';bk.setAttribute('opacity',1-seg(t,13.2,13.6));drawBack(t,z)} else bk.style.display='none';
+  const whip=t>9.6&&t<10.15?Math.sin(Math.PI*seg(t,9.6,10.15))*14:0;
+  sv.style.filter=(filt+(whip?` blur(${whip}px)`:'')).trim()||'none';
+  show(sv,inEnd&&t<26.6?1-seg(t,22.9,23.3):1);
+  if(t>=26.6)show(sv,seg(t,26.6,27));
+  // fog from the big exhale
+  show($('fog'),TEA?0.35*inout(t,8.6,9.7,.4,.2):0.55*inout(t,8.8,9.9,.5,.3));
+  // rewind markers
+  const rw=t>=2.6&&t<7.6; show($('rew'),rw?(Math.floor(t*2.5)%2?1:0.75):0); show($('scan'),rw?1:0);
+  // flash on whip
+  $('flash').style.opacity=0.35*(1-seg(t,22.9,23.2))*(t>=22.9?1:0);
+  // top + captions
+  const tp=TOPS.find(x=>t>=x[0]&&t<x[1]),top=$('top');
+  if(tp){top.textContent=tp[2];const k=back(seg(t,tp[0],tp[0]+0.3));show(top,inout(t,tp[0],tp[1],.15,.2));top.style.transform=`scale(${0.7+0.3*k})`}else show(top,0);
+  const cp=CAPS.find(x=>t>=x[0]&&t<x[1]),cap=$('cap');
+  if(cp){words(cap,cp[2],cp[0],t,cp[3]||'hl');show(cap,1-seg(t,cp[1]-0.15,cp[1]))}else show(cap,0);
+  // pushes
+  [...pushes.children].forEach((d,i)=>{const t0=PUSH[i][4];const k=eout(seg(t,t0,t0+0.3));const n=PUSH.filter(p=>p[4]<=t).length;const y=170+(n-1-i)*148;
+    d.style.top=y+'px';d.style.transform=`translateY(${-160*(1-k)}px) scale(${0.9+0.1*k})`;const age=n-1-i;show(d,t>=t0&&t<7.6&&age<3?k*(1-seg(t,7.35,7.6))*(age<2?1:0.6):0)});
+  // Kubysh bubbles
+  const kub=$('kub'),bK=$('bubK'),bM=$('bubM');
+  let kt='',kt0=0,pos=null;
+  if(t>=11.0&&t<13.5){kt0=t<12.2?11.0:12.2;kt=t<12.2?'Я Кубыш, приложение на айфон':'Считаю, <b>хватит ли до получки</b>';pos={bl:'60px',bt:'1270px',org:'50% 0%'}}
+  else if(t>=13.6&&t<15.4){kt0=13.6;kt='Смотри';pos={bl:'330px',bt:'1640px',org:'0% 50%'};kub.style.left='70px';kub.style.top='1600px';
+    const a=back(seg(t,13.6,13.95));kub.style.transform=`scale(${a}) rotate(${Math.sin(t*6)*3}deg)`;show(kub,1)}
+  else if(t>=21.0&&t<22.9){kt0=21.0;kt='Это <b>я</b> разбираюсь';pos={bl:'auto',br:'60px',bt:'880px',org:'80% 100%'}}
+  if(!(t>=13.6&&t<15.4))show(kub,0);
+  if(kt){if(bK.innerHTML!==kt)bK.innerHTML=kt;const a=back(seg(t,kt0+0.05,kt0+0.35));bK.style.left=pos.bl;bK.style.right=pos.br||'auto';bK.style.top=pos.bt;bK.style.transformOrigin=pos.org;
+    bK.style.transform=`scale(${a})`;show(bK,cl(a*2))}else show(bK,0);
+  if(t>=19.2&&t<22.9){const txt='Я, кстати, в финансах разбираюсь';if(bM.textContent!==txt)bM.textContent=txt;const a=back(seg(t,19.2,19.5));bM.style.left='60px';bM.style.top='380px';bM.style.transformOrigin='30% 100%';bM.style.transform=`scale(${a})`;show(bM,cl(a*2)*(t<21?1:0.55))}else show(bM,0);
+  // app scene
+  const ph=$('phone'),ring=$('ring');
+  if(inApp){const k=eout(seg(t,13.3,13.9));const z=eout(seg(t,14.9,15.6));
+    const s2=1+0.15*z, f0=0.893*s2, ox=((1080-889*f0)/2-40-113*f0)*z, oy=(520-300-663*f0)*z;
+    ph.style.transform=`translate(${ox}px,${900*(1-k)+oy}px) scale(${s2})`;ph.style.transformOrigin='0 0';show(ph,1);
+    const L=40+ox+113*f0,T=300+oy+663*f0;ring.style.left=L+'px';ring.style.top=T+'px';ring.style.width=(889*f0)+'px';ring.style.height=(447*f0)+'px';show(ring,seg(t,15.4,15.8)*(1-seg(t,18.9,19.2)));
+  }else{show(ph,0);show(ring,0)}
+  [...chips.children].forEach((d,i)=>{const t0=CHIPS[i][0];const k=back(seg(t,t0,t0+0.35));d.style.transform=`translateX(-50%) scale(${k})`;show(d,t>=t0&&t<19.0?cl(k*2):0)});
+  // end card
+  const e=$('end');show(e,inEnd?eout(seg(t,22.9,23.3))*(1-seg(t,26.6,27)):0);
+  [...e.children].forEach((c,i)=>{const k=back(seg(t,23.0+i*0.25,23.35+i*0.25));c.style.transform=`translateY(${40*(1-k)}px) scale(${0.85+0.15*k})`;c.style.opacity=cl(k*1.5)});
+  $('bar').style.width=(1080*t/D)+'px';
+}
+window.render=render; window.DUR=D;
+
+const RENDER=location.hash.includes('render'); if(RENDER)document.body.classList.add('render');
+function fit(){const w=$('wrap').clientWidth;$('stage').style.transform=`scale(${RENDER?1:w/1080})`}
+addEventListener('resize',fit);fit();
+let playing=!RENDER&&!matchMedia('(prefers-reduced-motion: reduce)').matches,t0=performance.now(),cur=0;
+const seek=$('seek'),tc=$('tc'),btn=$('play');
+btn.textContent=playing?'Пауза':'Смотреть';
+btn.onclick=()=>{playing=!playing;btn.textContent=playing?'Пауза':'Смотреть';t0=performance.now()-cur*1000};
+seek.oninput=()=>{cur=+seek.value;t0=performance.now()-cur*1000;render(cur);tc.textContent=cur.toFixed(1)+' с'};
+render(RENDER?0:1.0);
+function loop(){if(playing){cur=((performance.now()-t0)/1000)%D;render(cur);seek.value=cur;tc.textContent=cur.toFixed(1)+' с'}requestAnimationFrame(loop)}
+if(!RENDER)requestAnimationFrame(loop);
+</script>

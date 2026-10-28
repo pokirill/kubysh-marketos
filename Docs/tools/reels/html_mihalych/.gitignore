@@ -1,3 +1,4 @@
 mihalych.html
-audio.wav
-mihalych.mp4
+audio*.wav
+*.mp4
+g.html
