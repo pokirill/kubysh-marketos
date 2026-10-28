@@ -12,23 +12,25 @@ def lp(x, a):
     return y
 def env(x, win=480):
     n = len(x) // win; r = np.sqrt((x[:n*win].reshape(n, win) ** 2).mean(1)); return r
-def raspy(x):
-    """Пропитый сиплый тембр: мягкая сатурация + придыхание по огибающей голоса."""
-    sat = np.tanh(2.6 * x) / np.tanh(2.6)
-    e = np.repeat(env(x, 240), 240); e = np.pad(e, (0, len(x) - len(e)))
-    n = np.random.default_rng(3).standard_normal(len(x)); n = n - lp(n, 0.25); n = lp(n, 0.6)
-    y = 0.85 * sat + 0.9 * n * e
-    return y / max(1e-6, np.abs(y).max()) * 0.95
+TEMPO = 1.15  # Михалыч чуть быстрее (Кирилл 28.10: «слишком медленно»)
+# Поддатый голос без баса и сиплости: срез низов, плавающая интонация (медленное вибрато тона) и легкая «качка».
+DRUNK = "highpass=f=150,equalizer=f=220:t=q:w=1.2:g=-5,atempo=%.2f,vibrato=f=0.9:d=0.22,vibrato=f=5:d=0.04,tremolo=f=1.3:d=0.12" % TEMPO
+import subprocess, os
+def drunk(n):
+    out = f"/tmp/{n}_drunk.wav"
+    subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", f"{src}/{n}.wav", "-af", DRUNK, "-ar", "48000", "-ac", "1", out], check=True)
+    w = wave.open(out); x = np.frombuffer(w.readframes(w.getnframes()), np.int16).astype(float) / 32768
+    return x / max(1e-6, np.abs(x).max()) * 0.95
 M = ["m1t", "m2t", "m3t", "m4"] if T else ["m1", "m2", "m3", "m4"]
 lines = {"m1": M[0], "m2": M[1], "m3": M[2], "m4": "m4", "k1": "k1", "k2": "k2", "k3": "k3", "k4": "k4", "k5": "k5"}
 slots = [("m1", .1, 2.6, .15), ("m2", 2.9, 5.6, .15), ("m3", 5.6, 7.6, .1), ("k1", 7.9, 9.6, .15), ("k2", 11.0, 13.5, .2),
          ("k3", 13.6, 18.9, .15), ("m4", 19.2, 20.95, .2), ("k4", 21.0, 22.9, .1), ("k5", 23.0, 26.6, .8)]
 def wt(n, pre):
     for w, a, b in W[n]:
-        if w.lower().strip(",.!?–—").startswith(pre): return a
+        if w.lower().strip(",.!?–—").startswith(pre): return a / (TEMPO if n.startswith("m") else 1)
     raise SystemExit(f"нет слова {pre} в {n}")
 inner = {"k1": [("как", 8.55)], "k2": [("считаю", 12.2)]}
-aud = {k: (raspy(rd(v)) if k.startswith("m") else rd(v) * 0.95) for k, v in lines.items()}
+aud = {k: (drunk(v) if k.startswith("m") else rd(v) * 0.95) for k, v in lines.items()}
 R, o, warp, place = 0.0, 0.0, [[0.0, 0.0]], {}
 for k, a, b, lead in slots:
     R += a - o; t0 = R; d = len(aud[k]) / SR
