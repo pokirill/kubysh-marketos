@@ -10,7 +10,8 @@ SR=48000; D=VO['D']; N=int(SR*D); L=np.zeros(N); R=np.zeros(N)
 rng=np.random.default_rng(7)
 def add(t,x,g=1.0,pan=0.0,raw=False):
     t=t if raw else Wm(t); i=int(t*SR)
-    if i>=N: return; j=min(N,i+len(x)); x=x[:j-i]*g
+    if i>=N or i<0: return
+    j=min(N,i+len(x)); x=x[:j-i]*g
     L[i:j]+=x*math.sqrt((1-pan)/2); R[i:j]+=x*math.sqrt((1+pan)/2)
 def env(n,a=0.005,r=None):
     t=np.arange(n)/SR; return np.minimum(1,t/a)*np.exp(-t/(r if r else n/SR/4))
