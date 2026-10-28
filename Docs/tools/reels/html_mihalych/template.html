@@ -1,0 +1,188 @@
+<title>Михалыч на льду</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700;800;900&display=swap">
+<style>
+/* Layout: one 1080×1920 reel stage, scaled to fit; dark app world + cartoon ice world */
+:root{
+  --ink:#06100c; --app:#0b1512; --card:#16201d; --fg:#f3f6f4; --muted:#9fb0a9;
+  --green:#3ecf86; --red:#ff7474; --amber:#ffc44d; --plate:#000000d9;
+  --display:"Inter Tight","Inter Display","Inter",system-ui,sans-serif;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--ink);color:var(--fg);font-family:var(--display);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;overflow:hidden}
+body.render{padding:0;display:block}
+#wrap{position:relative;width:min(100%,calc((100vh - 90px) * 0.5625));aspect-ratio:9/16;max-width:100%}
+body.render #wrap{width:1080px;height:1920px}
+#stage{position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:0 0;overflow:hidden;background:var(--app)}
+.abs{position:absolute}
+#bgblur{inset:-120px;background-size:cover;background-position:center;filter:blur(50px) brightness(.45) saturate(1.2)}
+#appbg{inset:0;background:radial-gradient(700px 600px at 15% 10%,#1f6b4a66,transparent 70%),radial-gradient(700px 700px at 90% 90%,#1d3f6e55,transparent 70%),linear-gradient(#09110e,#030605)}
+#mihbox{left:0;top:430px;width:1080px;height:1080px;overflow:hidden}
+#mih{width:1080px;height:1080px;transform-origin:50% 60%}
+#glow{inset:0;background:radial-gradient(circle at 50% 55%,#3ecf8655,transparent 60%);mix-blend-mode:screen;opacity:0}
+#crack{left:0;top:430px;width:1080px;height:1080px}
+#crack path{fill:none;stroke:#e9f6ff;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 6px #9fd8ff)}
+#top{left:60px;right:60px;top:170px;text-align:center;font-weight:900;font-size:84px;line-height:1.08;letter-spacing:-.02em;text-wrap:balance;
+  text-shadow:0 4px 0 #000,0 0 24px #000a}
+#cap{left:90px;right:90px;top:1560px;display:flex;flex-wrap:wrap;justify-content:center;gap:12px 14px}
+.w{background:var(--plate);border-radius:18px;padding:8px 18px 12px;font-weight:800;font-size:64px;line-height:1.05;letter-spacing:-.01em}
+.w.hl{color:var(--amber)} .w.red{color:var(--red)} .w.grn{color:var(--green)}
+.push{left:70px;width:940px;height:132px;border-radius:34px;background:#1b2421ee;border:2px solid #ffffff17;display:flex;align-items:center;gap:26px;padding:0 34px;box-shadow:0 20px 50px #0009}
+.push .ic{width:76px;height:76px;border-radius:20px;background:#2a3431;display:grid;place-items:center;font-size:44px}
+.push .t{flex:1;font-size:40px;font-weight:600;color:var(--fg)}
+.push .t small{display:block;font-size:30px;color:var(--muted);font-weight:500}
+.push .s{font-size:48px;font-weight:800;color:var(--red);font-variant-numeric:tabular-nums}
+#rew{left:60px;top:88px;font-weight:800;font-size:46px;color:#fff;background:#d23b3bdd;border-radius:14px;padding:8px 20px}
+#scan{inset:0;background:repeating-linear-gradient(#ffffff0a 0 2px,transparent 2px 6px);mix-blend-mode:overlay}
+#kub{width:250px;height:250px}
+#kub img{width:100%;height:100%;border-radius:58px;box-shadow:0 18px 50px #000b,0 0 0 6px #3ecf86aa;image-rendering:auto}
+.bub{background:#f6fbf8;color:#0a1410;font-weight:800;font-size:58px;line-height:1.1;border-radius:40px;padding:26px 36px;max-width:760px;box-shadow:0 18px 50px #0008;text-wrap:balance}
+.bub b{color:#1a9c5c}
+.bub.mih{background:#fff3d6}
+#phone{left:40px;top:300px;width:1000px;border-radius:40px;overflow:hidden;box-shadow:0 40px 90px #000c}
+#phone img{width:1000px;display:block}
+#ring{border:8px solid var(--green);border-radius:34px;box-shadow:0 0 0 9999px #00000088,0 0 40px #3ecf86}
+.chip{left:50%;font-weight:700;font-size:52px;border-radius:999px;padding:16px 38px;white-space:nowrap;background:#10261c;border:3px solid #3ecf86aa;color:var(--green);box-shadow:0 0 40px #3ecf8640}
+.chip.blu{background:#132033;border-color:#6aa6ff99;color:#a9ccff}
+#end{inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;text-align:center}
+#end img{width:320px;height:320px;border-radius:74px;box-shadow:0 0 0 8px #3ecf86,0 30px 80px #000c}
+#end h1{margin:0;font-size:120px;font-weight:900;letter-spacing:-.03em}
+#end p{margin:0;font-size:58px;font-weight:700;color:var(--fg)}
+#end .cta{font-size:62px;font-weight:800;background:var(--green);color:#062014;border-radius:999px;padding:24px 56px}
+#end .sub{font-size:48px;font-weight:600;color:var(--green)}
+#bar{left:0;top:0;height:10px;background:var(--green)}
+#flash{inset:0;background:#fff;opacity:0}
+#fadeloop{inset:0;opacity:0;background-size:cover}
+#ctrl{display:flex;gap:12px;align-items:center;width:min(100%,560px)}
+#ctrl button{font:600 15px var(--display);background:var(--green);color:#062014;border:0;border-radius:999px;padding:8px 18px;cursor:pointer}
+#ctrl button:focus-visible,#ctrl input:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+#ctrl input{flex:1;accent-color:var(--green)}
+#ctrl span{font:500 14px var(--display);color:var(--muted);font-variant-numeric:tabular-nums;min-width:54px}
+body.render #ctrl{display:none}
+</style>
+
+<div id="wrap"><div id="stage">
+  <div id="appbg" class="abs"></div>
+  <div id="bgblur" class="abs" style="background-image:url({{MIH}})"></div>
+  <div id="mihbox" class="abs"><img id="mih" src="{{MIH}}" alt="Михалыч в тапках на льду"><div id="glow" class="abs"></div></div>
+  <svg id="crack" class="abs" viewBox="0 0 1080 1080"><path id="cr1" d="M540 1080 L520 960 L585 880 L560 790 L640 720 L610 640"/><path id="cr2" d="M585 880 L700 860 L780 905 L900 880 L1080 930"/><path id="cr3" d="M560 790 L450 760 L380 800 L250 770 L120 820 L0 800"/><path id="cr4" d="M640 720 L720 650 L800 670"/></svg>
+  <div id="phone" class="abs"><img src="{{SCR}}" alt="Экран Получки в Кубыше"></div>
+  <div id="ring" class="abs"></div>
+  <div id="pushes"></div>
+  <div id="rew" class="abs">◀◀ 10 дней назад</div>
+  <div id="scan" class="abs"></div>
+  <div id="top" class="abs"></div>
+  <div id="cap" class="abs"></div>
+  <div id="chips"></div>
+  <div id="kub" class="abs"><img src="{{ICO}}" alt="Кубыш"></div>
+  <div id="bubK" class="abs bub"></div>
+  <div id="bubM" class="abs bub mih"></div>
+  <div id="end" class="abs">
+    <img src="{{ICO}}" alt="Иконка Кубыша">
+    <h1>Кубыш</h1>
+    <p>Считает, хватит ли до получки</p>
+    <div class="cta">Скачай бесплатно в App Store</div>
+    <div class="sub">Комфортно сегодня, спокойно завтра</div>
+  </div>
+  <div id="flash" class="abs"></div>
+  <div id="bar" class="abs"></div>
+</div></div>
+<div id="ctrl"><button id="play" type="button">Пауза</button><input id="seek" type="range" min="0" max="27" step="0.01" value="0" aria-label="Перемотка"><span id="tc">0.0 с</span></div>
+
+<script>
+const D=27.0, $=id=>document.getElementById(id);
+const cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)), seg=(t,a,b)=>cl((t-a)/(b-a));
+const eout=x=>1-Math.pow(1-cl(x),3), back=x=>{x=cl(x)-1;return x*x*(2.8*x+1.8)+1};
+const inout=(t,a,b,fi=.3,fo=.25)=>Math.min(eout(seg(t,a,a+fi)),1-seg(t,b-fo,b));
+const show=(el,o)=>{el.style.opacity=o;el.style.visibility=o<=0.001?'hidden':'visible'};
+
+// Captions: words with *accent*; class by marker
+function words(el,txt,t0,t,cls='hl'){
+  if(el.dataset.k!==txt){el.dataset.k=txt;let on=false;el.innerHTML=txt.split(' ').map(w=>{let a=on||w.startsWith('*');if(w.startsWith('*'))on=true;if(w.endsWith('*'))on=false;w=w.replace(/\*/g,'');return `<span class="w${a?' '+cls:''}">${w}</span>`}).join('')}
+  [...el.children].forEach((s,i)=>{const k=back(seg(t,t0+i*0.07,t0+i*0.07+0.22));s.style.opacity=cl(k*1.4);s.style.transform=`scale(${0.6+0.4*k})`});
+}
+const CAPS=[[0.25,2.35,'Хватит или *нет?*','red'],[5.9,8.9,'Ну кофе, ну такси, ну *по мелочи*'],[8.9,10.4,'А сколько осталось, *непонятно*','red'],
+  [10.7,12.6,'как лед *в тапках*'],[15.0,18.5,'Каждый день знаешь, сколько *можно сегодня*','grn']];
+const TOPS=[[0.0,2.4,'Я, когда до получки 5 дней'],[10.5,12.6,'Жизнь без плана']];
+const PUSH=[['🛵','Доставка','Самокат','−1 800 ₽',6.0],['🚕','Такси','Поездка домой','−900 ₽',6.75],['🏷️','Распродажа −70%','Маркетплейс','−6 400 ₽',7.5],['☕','Кофе','Кофейня','−350 ₽',8.2],['📦','Маркетплейс','Ну очень нужно','−2 700 ₽',8.8]];
+const CHIPS=[[16.0,'До получки хватает','',1290],[16.8,'≈4 800 ₽ в день','blu',1400]];
+const pushes=$('pushes'), chips=$('chips');
+PUSH.forEach(p=>{const d=document.createElement('div');d.className='abs push';d.innerHTML=`<div class="ic">${p[0]}</div><div class="t">${p[1]}<small>${p[2]}</small></div><div class="s">${p[3]}</div>`;pushes.appendChild(d)});
+CHIPS.forEach(c=>{const d=document.createElement('div');d.className='abs chip '+c[2];d.textContent=c[1];d.style.top=c[3]+'px';chips.appendChild(d)});
+const len=p=>p.getTotalLength();
+const cracks=['cr1','cr2','cr3','cr4'].map($);cracks.forEach(p=>{const L=len(p);p.style.strokeDasharray=L;p.dataset.L=L});
+
+function render(t){
+  // scenes
+  const sMih=t<12.6||(t>=18.6&&t<22.9), sApp=t>=12.6&&t<18.6, sEnd=t>=22.9;
+  show($('bgblur'),sMih?1:0); show($('mihbox'),sMih?1:0); show($('appbg'),1);
+  // Mikhalych camera
+  const m=$('mih'); let sc=1,rx=0,ry=0,rot=0,filt='';
+  if(t<5.4){const k=1.12+0.05*seg(t,0,5.4);sc=k;rot=Math.sin(t*7.3)*3.2+Math.sin(t*13.1)*1.4;rx=Math.sin(t*9.7)*14;ry=Math.cos(t*8.1)*8}
+  else if(t<10.4){sc=1.05;rot=Math.sin(t*3)*1.2;filt='sepia(.55) saturate(1.3) hue-rotate(-10deg) brightness(1.05)'}
+  else if(t<12.6){const k=seg(t,10.4,10.8);sc=1.1+0.25*eout(k);rot=-14*eout(k)+Math.sin(t*40)*(1-seg(t,10.4,11.2))*4;ry=120*eout(k)}
+  else {const k=seg(t,18.6,22.9);sc=1.04+0.08*k}
+  m.style.transform=`translate(${rx}px,${ry}px) rotate(${rot}deg) scale(${sc})`; m.style.filter=filt;
+  $('glow').style.opacity=t>=18.6&&t<22.9?0.9*seg(t,18.6,19.4):0;
+  // crack: first hint at hook, full at 10.4
+  cracks.forEach((p,i)=>{const L=+p.dataset.L;let k=0;if(t<2.4)k=i==0?0.55*seg(t,0.9,1.3):0;else if(t>=10.4&&t<12.6)k=seg(t,10.4+i*0.05,10.75+i*0.05);p.style.strokeDashoffset=L*(1-k)});
+  show($('crack'),(t<2.4||(t>=10.4&&t<12.6))?1:0);
+  // flash on crack
+  $('flash').style.opacity=0.55*(1-seg(t,10.4,10.65))*(t>=10.4?1:0)+0.35*(1-seg(t,22.9,23.2))*(t>=22.9?1:0);
+  // rewind
+  const rw=t>=5.4&&t<10.4; show($('rew'),rw?(Math.floor(t*2.5)%2?1:0.75):0); show($('scan'),rw||t<0.3?1:0);
+  // top meme text
+  const tp=TOPS.find(x=>t>=x[0]&&t<x[1]); const top=$('top');
+  if(tp){top.textContent=tp[2];const k=back(seg(t,tp[0],tp[0]+0.3));show(top,inout(t,tp[0],tp[1],.15,.2));top.style.transform=`scale(${0.7+0.3*k})`}else show(top,0);
+  // captions
+  const cp=CAPS.find(x=>t>=x[0]&&t<x[1]); const cap=$('cap');
+  if(cp){words(cap,cp[2],cp[0],t,cp[3]||'hl');show(cap,1-seg(t,cp[1]-0.15,cp[1]))}else show(cap,0);
+  // pushes stack from top
+  [...pushes.children].forEach((d,i)=>{const t0=PUSH[i][4];const k=eout(seg(t,t0,t0+0.3));const n=PUSH.filter(p=>p[4]<=t).length;const y=200+(n-1-i)*150;
+    d.style.top=y+'px';d.style.transform=`translateY(${-160*(1-k)}px) scale(${0.9+0.1*k})`;show(d,t>=t0&&t<10.4?k*(1-seg(t,10.2,10.4)):0)});
+  // Kubysh avatar + bubble
+  const kub=$('kub'),bK=$('bubK'),bM=$('bubM');
+  let kv=0,kx=780,ky=1280,kt='',kt0=0,ks=1;
+  if(t>=2.4&&t<5.4){kv=1;kx=760;ky=1250;kt0=t<3.9?2.4:3.9;kt=t<3.9?'Я Кубыш, приложение на айфон':'Считаю, <b>хватит ли до получки</b>'}
+  else if(t>=12.6&&t<15.0){kv=1;kx=60;ky=1590;kt0=12.6;kt='Смотри'}
+  else if(t>=20.6&&t<22.9){kv=1;kx=780;ky=1250;kt0=20.6;kt='Это <b>я</b> разбираюсь'}
+  if(kv){const a=back(seg(t,kt0,kt0+0.35));kub.style.left=kx+'px';kub.style.top=ky+'px';kub.style.transform=`scale(${ks*(kt0===2.4||kt0===12.6||kt0===20.6?a:1)}) rotate(${Math.sin(t*6)*3}deg)`;show(kub,1)}else show(kub,0);
+  if(kv&&kt){if(bK.innerHTML!==kt)bK.innerHTML=kt;const a=back(seg(t,kt0+0.1,kt0+0.4));
+    if(kx>500){bK.style.left='auto';bK.style.right='60px';bK.style.top=(ky-200)+'px';bK.style.transformOrigin='90% 100%'}else{bK.style.right='auto';bK.style.left=(kx+280)+'px';bK.style.top=(ky+40)+'px';bK.style.transformOrigin='0% 50%'}
+    if(kx>500&&t>=20.6){bK.style.top=(ky-190)+'px'}
+    bK.style.transform=`scale(${a})`;show(bK,cl(a*2))}else show(bK,0);
+  if(t>=18.8&&t<22.9){const txt='Я, кстати, в финансах разбираюсь';if(bM.textContent!==txt)bM.textContent=txt;const a=back(seg(t,18.8,19.1));bM.style.left='60px';bM.style.top='250px';bM.style.transformOrigin='20% 100%';bM.style.transform=`scale(${a})`;show(bM,cl(a*2)*(t<20.6?1:0.55))}else show(bM,0);
+  // phone screen
+  const ph=$('phone'),ring=$('ring');
+  if(sApp){const k=eout(seg(t,12.7,13.3));const z=eout(seg(t,13.9,14.6));
+    const s=1+0.15*z, f0=0.893*s, ox=((1080-889*f0)/2-40-113*f0)*z, oy=(520-300-663*f0)*z;
+    ph.style.transform=`translate(${ox}px,${900*(1-k)+oy}px) scale(${s})`;ph.style.transformOrigin='0 0';show(ph,1);
+    // ring around insight card (source px 113..1002 x, 663..1110 y; displayed scale .893)
+    const f=0.893*s, L=40+ox+113*f, T=300+oy+663*f, W=889*f, H=447*f;
+    ring.style.left=L+'px';ring.style.top=T+'px';ring.style.width=W+'px';ring.style.height=H+'px';show(ring,seg(t,14.4,14.8)*(1-seg(t,18.3,18.6)));
+  }else{show(ph,0);show(ring,0)}
+  [...chips.children].forEach((d,i)=>{const t0=CHIPS[i][0];const k=back(seg(t,t0,t0+0.35));d.style.transform=`translateX(-50%) scale(${k})`;show(d,t>=t0&&sApp?cl(k*2):0)});
+  // end card
+  const e=$('end');show(e,sEnd?eout(seg(t,22.9,23.3))*(1-seg(t,26.6,27)):0);
+  [...e.children].forEach((c,i)=>{const k=back(seg(t,23.0+i*0.25,23.35+i*0.25));c.style.transform=`translateY(${40*(1-k)}px) scale(${0.85+0.15*k})`;c.style.opacity=cl(k*1.5)});
+  if(sEnd&&t>=26.6){show($('bgblur'),seg(t,26.6,27));show($('mihbox'),seg(t,26.6,27))}
+  $('bar').style.width=(1080*t/D)+'px';
+}
+window.render=render; window.DUR=D;
+
+// Viewer: fit + play loop
+const RENDER=location.hash==='#render'; if(RENDER)document.body.classList.add('render');
+function fit(){const w=$('wrap').clientWidth;$('stage').style.transform=`scale(${RENDER?1:w/1080})`}
+addEventListener('resize',fit);fit();
+let playing=!RENDER&&!matchMedia('(prefers-reduced-motion: reduce)').matches, t0=performance.now(), cur=0;
+const seek=$('seek'),tc=$('tc'),btn=$('play');
+btn.textContent=playing?'Пауза':'Смотреть';
+btn.onclick=()=>{playing=!playing;btn.textContent=playing?'Пауза':'Смотреть';t0=performance.now()-cur*1000};
+seek.oninput=()=>{cur=+seek.value;t0=performance.now()-cur*1000;render(cur);tc.textContent=cur.toFixed(1)+' с'};
+render(RENDER?0:3.0);
+function loop(){if(playing){cur=((performance.now()-t0)/1000)%D;render(cur);seek.value=cur;tc.textContent=cur.toFixed(1)+' с'}requestAnimationFrame(loop)}
+if(!RENDER)requestAnimationFrame(loop);
+</script>
