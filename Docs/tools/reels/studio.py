@@ -792,7 +792,10 @@ class Ep:
         cur, prev, fd, ts = self.sets[0][1], None, 0, 0
         for tt, nm, f in self.sets:
             if tt <= t: prev, cur, fd, ts = cur, nm, f, tt
-        bg = P.get_set(cur).resize((W, H), Image.BILINEAR, box=box)
+        si = P.get_set(cur)   # камера у края декорации: сдвигаем рамку внутрь
+        sx = min(0, si.width - box[2]) - min(0, box[0]); sy = min(0, si.height - box[3]) - min(0, box[1])
+        box = [box[0] + sx, box[1] + sy, box[2] + sx, box[3] + sy]
+        bg = si.resize((W, H), Image.BILINEAR, box=box)
         if prev and fd > 0 and t < ts + fd:
             bp = P.get_set(prev).resize((W, H), Image.BILINEAR, box=box); bg = Image.blend(bp, bg, seg(t, ts, ts + fd))
         return bg.convert("RGBA")
