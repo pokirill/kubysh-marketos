@@ -34,6 +34,11 @@ def plan_card(t, t0, t_hi):
 def build():
     ep = Ep("W06_K8_Пятница", "room"); ep.sfxgain = 0.5
     ep.avatars = {w: Image.open(RK + f"Референсы/avatar_{w}.png").convert("RGBA") for w in ("kubysh", "dush")}
+    def badge(txt, col):   # аватар для голосов без персонажа в кадре: кружок с подписью
+        im = Image.new("RGBA", (104, 104), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+        d.ellipse([2, 2, 101, 101], fill=col + (255,), outline=(255, 255, 255, 255), width=5)
+        d.text((52, 54), txt, font=PH.font("Bold", 38 if len(txt) > 1 else 50), fill=(255, 255, 255), anchor="mm"); return im
+    ep.avatars["hero"] = badge("ТЫ", (230, 120, 40)); ep.avatars["friend"] = badge("П", (60, 110, 230))
     kub = ep.actor("kub", "kubysh", 800, s=0.66)
     dush = ep.actor("dush", "dush", -320, s=0.64, mirror=True, hidden=True)
 
@@ -46,9 +51,11 @@ def build():
         return t0, t1
 
     # 1 · пятница, зовут в бар, на карте 11 400
-    ep.notif(0.1, 3.4, "Пацаны · 17:58", "Бар в 20:00?", icon="П", color=(60, 110, 230))
     kub.expr(0, "worried")
-    a0, a1 = say("hero", "f1", "Пятница. До зарплаты 5 дней, на карте 11 тысяч. И х*р его знает, *сколько из них мои*", at=0.3)
+    q0, q1 = say("friend", "fr", "Братан, сегодня в восемь *в бар.* Ты с нами?", at=0.25)
+    ep.notif(0.1, q1 + 0.6, "Пацаны · 17:58", "Сегодня в 20:00 в бар. Ты с нами?", icon="П", color=(60, 110, 230))
+    kub.react(q1 - 0.3, "shudder")
+    a0, a1 = say("hero", "f1", "Пятница. До зарплаты 5 дней, на карте 11 тысяч. И х*р его знает, *сколько из них мои*", at=q1 + 0.25)
     ep.pill(a0 + 1.6, a1 + 0.2, "до зарплаты 5 дней", 540, 560, size=54, **STY["red"]); ep.pill(a0 + 2.6, a1 + 0.2, "на карте 11 400 ₽", 540, 680, size=54, **STY["dark"])
     ep.sfx(a0 + 1.6, "pop", 0.4); ep.sfx(a0 + 2.6, "pop", 0.4)
     # 2 · Душная
@@ -70,17 +77,20 @@ def build():
     ep.sfx(t_hi, "ding", 0.4)
     # 5 · бар; поворот: Душная за соседним столом с водой
     tb = d1 + 0.35
-    ep.clip(tb, tb + 4.4, BAR, "бар"); ep.sfx(tb, "swish", 0.5)
+    ep.TB = tb; ep.sfx(tb, "swish", 0.5)
     kub.expr(tb, "happy"); dush.place(tb, 230); dush.expr(tb, "neutral"); ep.shot(tb, "wide")
     e0, e1 = say("kubysh", "k3", "Бар влезает в план. *Решать тебе*", at=tb + 0.3, a=kub)
     glass = Image.new("RGBA", (90, 130), (0, 0, 0, 0)); g = ImageDraw.Draw(glass)
     g.polygon([(8, 4), (82, 4), (72, 126), (18, 126)], fill=(200, 230, 255, 150), outline=(255, 255, 255, 230)); g.rectangle([16, 50, 74, 120], fill=(170, 210, 250, 150))
-    ep.add(e1, tb + 4.4, "front", lambda img, t, cam: comp(img, glass, 380, 1270))
-    ep.pill(e1 + 0.1, tb + 4.4, "Душная: вода из-под крана", 540, 560, size=50, **STY["dark"]); ep.sfx(e1 + 0.1, "pop", 0.45)
+    ep.add(e1, 999, "front", lambda img, t, cam: comp(img, glass, 380, 1270) if t < ep.TBE else None)
     dush.expr(e1 + 0.1, "smug"); ep.shot(e1 + 0.1, "dush", z=1.25)
+    w0, w1 = say("dush", "d2", "Что? Вода из-под крана. *Зато бесплатно*", at=e1 + 0.5, a=dush)
+    tbe = w1 + 0.6
+    ep.pill(e1 + 0.1, w1 + 0.5, "Душная: вода из-под крана", 540, 560, size=50, **STY["dark"]); ep.sfx(e1 + 0.1, "pop", 0.45)
     # 6 · финал
-    h0, h1 = say("kubysh", "w_final2", "Я Кубыш, приложение на айфон. *Комфортно сегодня, спокойно завтра*", at=tb + 4.45, v=V3)
+    h0, h1 = say("kubysh", "w_final2", "Я Кубыш, приложение на айфон. *Комфортно сегодня, спокойно завтра*", at=tbe + 0.05, v=V3)
     end = h1 + 1.4
+    ep.TBE = tbe; ep.clip(tb, tbe, BAR, "бар")
     for a in (kub, dush): a.show(h0 - 0.05, False)
     ep.clip(h0 - 0.05, end, PHONE, "kub_cta", speed=min(1.0, 4.9 / (end - h0)))
     ep.pill(h0 + 1.0, end, "Комфортно сегодня, спокойно завтра", 540, 1420, size=46, **STY["green"]); ep.sfx(h0 + 1.0, "pop", 0.4)

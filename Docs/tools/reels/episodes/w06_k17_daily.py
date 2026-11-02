@@ -20,21 +20,21 @@ def build():
     ep = Ep("W06_K17_Сумма_на_день", "studio"); ep.sfxgain = 0.4
     ep.avatars = {"kubysh": Image.open(RK + "Референсы/avatar_kubysh.png").convert("RGBA")}
     say = lambda f, cap, at=None, v=V: ep.say("kubysh", "", cap=cap, at=at, y=Y, size=56, file=v + f + "_t_48k.wav")
-    a0, a1 = say("m1", "24 тысячи на 10 дней. Сколько в день? *Только не 2 400*", at=0.15)
-    b0, b1 = say("m2", "Сначала платежи до зарплаты. Осталось 18, значит *1 800 в день*", at=a1 + 0.3)
-    c0, c1 = say("m3", "Вчера ушло больше? Сумма просто *пересчиталась на оставшиеся дни*", at=b1 + 0.3)
-    f0, f1 = say("w_final2", "Я Кубыш, приложение на айфон. *Комфортно сегодня, спокойно завтра*", at=c1 + 0.9, v=V3)
+    a0, a1 = say("m1s", "24 тысячи на 10 дней. Сколько в день? *Только не 2 400*", at=0.15)
+    b0, b1 = say("m2s", "Сначала платежи до зарплаты. Осталось 18, значит *1 800 в день*", at=a1 + 1.0)
+    c0, c1 = say("m3s", "Вчера ушло больше? Сумма просто *пересчиталась на оставшиеся дни*", at=b1 + 1.2)
+    f0, f1 = say("w_final2", "Я Кубыш, приложение на айфон. *Комфортно сегодня, спокойно завтра*", at=c1 + 1.6, v=V3)
     end = f1 + 1.4
 
     def fn(img, t, cam):
         cv = PH.background(t).convert("RGBA"); d = ImageDraw.Draw(cv)
-        if t < a1 + 0.3:
+        if t < a1 + 0.9:
             k = eout(seg(t, 0, 0.4)); eq(cv, 560, [("24 000", PH.WHITE), ("÷", PH.SUB), ("10", PH.WHITE)], k, 110)
             if t > a0 + (a1 - a0) * 0.45: eq(cv, 760, [("=", PH.SUB), ("?", PH.AMBER)], 1, 130)
             if t > a0 + (a1 - a0) * 0.7:
                 eq(cv, 960, [("2 400", PH.RED)], 1, 130); s = seg(t, a0 + (a1 - a0) * 0.8, a0 + (a1 - a0) * 0.95)
                 d.line([(370, 960), (370 + 340 * s, 960)], fill=PH.RED, width=12)
-        elif t < b1 + 0.3:
+        elif t < b1 + 1.1:
             p = (t - b0) / max(0.1, b1 - b0)
             eq(cv, 420, [("24 000", PH.WHITE), ("−", PH.SUB), ("6 000", PH.BLUE)], 1, 96)
             if p > 0.05: PH.put(cv, PH.chip("платежи до зарплаты", PH.BLUE, 44), PH.W / 2, 540)
