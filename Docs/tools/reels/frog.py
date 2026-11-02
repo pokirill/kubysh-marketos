@@ -289,24 +289,28 @@ def _tongue(img, target, t):
 _TEACHER = {}
 
 
+DUSH_SIMPLE = False   # 02.11 Кирилл: образ перегружен; True — только серая жаба в очках-«кошках», без пучка, воротника, броши и цепочки
+
+
 def _teacher(img, pointer=False):
     """Карикатурная училка: пучок с карандашом, очки-«кошки» на цепочке, кружевной воротник, брошь."""
     if pointer not in _TEACHER:
         b = _Box((300, 50, 960, 920), ss=2); d = b.d
         hair, hair_dk = (92, 80, 78, 255), (60, 52, 52, 255)
-        d.ellipse(b.P([(400, 150), (560, 196)]), fill=hair)
-        d.ellipse(b.P([(430, 72), (530, 166)]), fill=hair)
-        for i in range(4):
-            d.arc(b.P([(440 + i * 6, 84 + i * 8), (520 - i * 6, 156 - i * 6)]), start=200, end=330, fill=hair_dk, width=b.w(4))
-        d.line(b.P([(412, 70), (548, 152)]), fill=(240, 196, 60, 255), width=b.w(12))
-        d.line(b.P([(412, 70), (426, 78)]), fill=(232, 140, 150, 255), width=b.w(12))
-        d.polygon(b.P([(548, 152), (566, 156), (552, 144)]), fill=(70, 60, 50, 255))
-        for cx, cy, w in ((372, 452, 118), (476, 470, 126)):
-            d.ellipse(b.P([(cx - w // 2, cy - 30), (cx + w // 2, cy + 34)]), fill=(250, 248, 240, 255), outline=(200, 196, 186, 255), width=b.w(3))
-            for k in range(7):
-                a = math.pi * (0.15 + 0.7 * k / 6); px, py = cx + w / 2 * math.cos(a), cy + 34 * math.sin(a)
-                d.ellipse(b.P([(px - 7, py - 7), (px + 7, py + 7)]), fill=(250, 248, 240, 255), outline=(200, 196, 186, 255), width=b.w(2))
-        d.ellipse(b.P([(410, 448), (448, 494)]), fill=(120, 48, 120, 255), outline=(214, 170, 60, 255), width=b.w(5))
+        if not DUSH_SIMPLE:
+            d.ellipse(b.P([(400, 150), (560, 196)]), fill=hair)
+            d.ellipse(b.P([(430, 72), (530, 166)]), fill=hair)
+            for i in range(4):
+                d.arc(b.P([(440 + i * 6, 84 + i * 8), (520 - i * 6, 156 - i * 6)]), start=200, end=330, fill=hair_dk, width=b.w(4))
+            d.line(b.P([(412, 70), (548, 152)]), fill=(240, 196, 60, 255), width=b.w(12))
+            d.line(b.P([(412, 70), (426, 78)]), fill=(232, 140, 150, 255), width=b.w(12))
+            d.polygon(b.P([(548, 152), (566, 156), (552, 144)]), fill=(70, 60, 50, 255))
+            for cx, cy, w in ((372, 452, 118), (476, 470, 126)):
+                d.ellipse(b.P([(cx - w // 2, cy - 30), (cx + w // 2, cy + 34)]), fill=(250, 248, 240, 255), outline=(200, 196, 186, 255), width=b.w(3))
+                for k in range(7):
+                    a = math.pi * (0.15 + 0.7 * k / 6); px, py = cx + w / 2 * math.cos(a), cy + 34 * math.sin(a)
+                    d.ellipse(b.P([(px - 7, py - 7), (px + 7, py + 7)]), fill=(250, 248, 240, 255), outline=(200, 196, 186, 255), width=b.w(2))
+            d.ellipse(b.P([(410, 448), (448, 494)]), fill=(120, 48, 120, 255), outline=(214, 170, 60, 255), width=b.w(5))
         fr = (112, 28, 52, 255)
         for e in ("L", "R"):
             (cx, cy), (rx, ry) = EYES[e]
@@ -315,7 +319,7 @@ def _teacher(img, pointer=False):
             wx = cx - rx - 10 if e == "L" else cx + rx + 10
             d.polygon(b.P([(wx, gy - 30), (wx + (-22 if e == "L" else 22), gy - 44), (wx + (6 if e == "L" else -6), gy - 12)]), fill=fr)
         d.line(b.P([(EYES["L"][0][0] + 44, EYES["L"][0][1] + 30), (EYES["R"][0][0] - 40, EYES["R"][0][1] + 30)]), fill=fr, width=b.w(7))
-        for (x0, y0), (x1, y1) in (((388, 300), (352, 452)), ((574, 320), (520, 468))):
+        for (x0, y0), (x1, y1) in ((() if DUSH_SIMPLE else (((388, 300), (352, 452)), ((574, 320), (520, 468))))):
             for k in range(15):
                 t = k / 14; x = x0 + (x1 - x0) * t - 26 * math.sin(math.pi * t); y = y0 + (y1 - y0) * t
                 d.ellipse(b.P([(x - 3, y - 3), (x + 3, y + 3)]), fill=(210, 170, 60, 255))

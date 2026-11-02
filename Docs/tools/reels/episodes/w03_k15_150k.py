@@ -6,19 +6,19 @@ from episodes.scr import STY, RK
 from episodes.lib import PHONE
 
 V = "/Users/kirillpopov/Documents/Кубыш доки и артефакты /Голоса/W03/"
-Y = 1560
+Y = 1360
 ROWS = [("Аренда", 45000, P.BLUE), ("Кредит", 27000, P.BLUE), ("Коммуналка", 8000, P.BLUE), ("Связь и транспорт", 6000, P.BLUE)]
 
 
 def build():
     ep = Ep("W03_K15_Куда_уходят_150", "studio"); ep.sfxgain = 0.4
     ep.avatars = {"kubysh": Image.open(RK + "Референсы/avatar_kubysh.png").convert("RGBA")}
-    say = lambda f, cap, at=None, **kw: ep.say("kubysh", "", cap=cap, at=at, y=Y, size=kw.get("size", 62), file=V + f + "_f_48k.wav")
+    say = lambda f, cap, at=None, **kw: ep.say("kubysh", "", cap=cap, at=at, y=Y, size=kw.get("size", 54), file=V + f + "_f_48k.wav")
     h0, h1 = say("w15_hook", "Зарплата *150 тысяч.* Куда она делась за неделю?", at=0.15)
     r0, r1 = say("w15_rent", "Аренда, кредит, коммуналка, дорога. Это даже не траты, это уже *чужие деньги*", at=h1 + 0.35)
     l0, l1 = say("w15_left", "Остается *64.* Десять в подушку, остальное на 30 дней", at=r1 + 0.35)
     d0, d1 = say("w15_daily", "Примерно *1 800 в день.* Это твои деньги, без чувства вины", at=l1 + 0.35)
-    f0, f1 = say("w_final", "Я Кубыш, приложение на айфон. *Считаю за тебя*", at=d1 + 0.45)
+    f0, f1 = say("w_final2", "Я Кубыш, приложение на айфон. *Комфортно сегодня, спокойно завтра*", at=d1 + 0.45)
     end = f1 + 1.6
     rt = [r0 + (r1 - r0) * k for k in (0.0, 0.13, 0.26, 0.42)]   # строки въезжают под слова
     lt_p, lt_d = l0 + (l1 - l0) * 0.3, l0 + (l1 - l0) * 0.62
@@ -48,9 +48,9 @@ def build():
                     d.rounded_rectangle([x0, y0, x0 + 16, y0 + 90], 8, fill=c)
                     d.text((x0 + 44, y0 + 18), n, font=P.font("Bold", 48), fill=P.WHITE)
                     d.text((pad + 940 - 34, y0 + 18), "−" + P.rub(amt), font=P.font("Bold", 50), fill=P.WHITE, anchor="ra")
-                    P.put(cv, im, P.W / 2 + 120 * (1 - k), 680 + i * 180, a=k)
+                    P.put(cv, im, P.W / 2 + 120 * (1 - k), 660 + i * 150, a=k)
                 ka = P.eout(P.span(t, r0 + (r1 - r0) * 0.55, r0 + (r1 - r0) * 0.55 + 0.4)) * (1 - kk)
-                if ka > 0: P.put(cv, P.chip("это уже чужие деньги", P.RED, 52), P.W / 2, 1420, a=ka, scale=P.lerp(1.2, 1, ka))
+                if ka > 0: P.put(cv, P.chip("это уже чужие деньги", P.RED, 52), P.W / 2, 1260, a=ka, scale=P.lerp(1.2, 1, ka))
             else:
                 k = P.eout(P.span(t, lt_p, lt_p + 0.45))
                 if k > 0:
@@ -74,6 +74,6 @@ def build():
     for st in rt: ep.sfx(st, "pop", 0.4)
     ep.sfx(lt_p, "pop", 0.4); ep.sfx(lt_d, "pop", 0.4); ep.sfx(l1 + 1.2, "kaching", 0.4)
     ep.clip(f0 - 0.05, end, PHONE, "kub_cta", speed=min(1.0, 4.9 / (end - f0)))
-    ep.pill(f1 - 0.4, end, "Комфортно сегодня, спокойно завтра", 540, 1190, size=46, **STY["green"]); ep.sfx(f1 - 0.4, "pop", 0.4)
+    ep.pill(f0 + 1.0, end, "Комфортно сегодня, спокойно завтра", 540, 1190, size=46, **STY["green"]); ep.sfx(f0 + 1.0, "pop", 0.4)
     ep.dur = end; ep.cover_t = 1.0
     return ep
