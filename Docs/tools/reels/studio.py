@@ -785,6 +785,8 @@ class Ep:
             if c["t0"] <= t < c["t1"]:
                 f = self._clip_frame(c, t)
                 box = [cx + (0 - 540 - dx) / z, cy + (0 - 960 - dy) / z, cx + (W - 540 - dx) / z, cy + (H - 960 - dy) / z]
+                sx = min(0, f.width - box[2]) - min(0, box[0]); sy = min(0, f.height - box[3]) - min(0, box[1])   # камера у края клипа: сдвигаем рамку внутрь
+                box = [box[0] + sx, box[1] + sy, box[2] + sx, box[3] + sy]
                 return f.resize((W, H), Image.BILINEAR, box=box).convert("RGBA")
         box = [(cx + (0 - 540 - dx) / z) * P.SC, (cy + (0 - 960 - dy) / z) * P.SC, (cx + (W - 540 - dx) / z) * P.SC, (cy + (H - 960 - dy) / z) * P.SC]
         cur, prev, fd, ts = self.sets[0][1], None, 0, 0
@@ -804,6 +806,8 @@ class Ep:
             for w, tw in zip(c["words"], c["times"]):
                 emph = w.startswith("*") or w.endswith("*") or "*" in w
                 clean = w.replace("*", "")
+                if "**" in w.strip("*"):   # цензура внутри слова (Пи**ец): звездочки оставляем, выделение только по краям
+                    clean = w.strip("*"); emph = w != clean
                 ims.append((word_img(clean, int(size * (1.1 if emph else 1)), fill=hi if emph else WHITE), tw))
             sp = int(size * 0.28); lines = [[]]; cw = 0
             for im, tw in ims:
