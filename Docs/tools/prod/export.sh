@@ -24,7 +24,12 @@ say() { echo "$*" | tee -a "$LOG"; }
 
 # 1. Сервер
 IP="${HOST_IP:-$(dig +short api.kubysh.com 2>/dev/null | grep -E '^[0-9.]+$' | tail -1)}"
-IP="${IP:-201.24.56.21}"
+# VPN и прокси с «фейковыми IP» подменяют DNS (240.x, 198.18.x, 10.x и т.п.) — такой адрес не сервер.
+case "$IP" in
+  ''|10.*|127.*|169.254.*|172.1[6-9].*|172.2[0-9].*|172.3[01].*|192.168.*|198.1[89].*|100.6[4-9].*|100.[7-9][0-9].*|100.1[01][0-9].*|100.12[0-7].*|2[4-5][0-9].*)
+    [ -n "$IP" ] && echo "DNS вернул $IP — похоже на подмену VPN, беру адрес прода из INFRA_TRUTH"
+    IP="201.24.56.21" ;;
+esac
 HOST="${HOST:-root@$IP}"
 CM="$HOME/.ssh/cm-kubysh-%r@%h:%p"
 SSH=(ssh -o BatchMode=yes -o ConnectTimeout=15 -o ControlMaster=auto -o ControlPath="$CM" -o ControlPersist=120 "$HOST")
