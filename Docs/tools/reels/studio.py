@@ -435,6 +435,9 @@ class Ep:
     def say(self, who, text, cap=None, at=None, gap=0.16, y=None, size=84, file=None):
         """Реплика героини в кадре клипа (Ксюша): file — ее живая запись, иначе черновой синтез (CAST[who])."""
         smp = audio.load(file) if file and os.path.exists(file) else audio.voice(text.replace("*", ""), who, VO_CACHE)
+        tg = getattr(self, "vnorm", {}).get(who)   # громкость реплики в дБ RMS, как в прошлых роликах
+        if tg is not None and len(smp):
+            r = math.sqrt(sum(x * x for x in smp) / len(smp)) or 1e-6; k = 10 ** (tg / 20) / r; smp = [max(-1.0, min(1.0, x * k)) for x in smp]
         t0 = self.cursor if at is None else at; d = len(smp) / audio.SR
         self.voice.append((t0, smp))
         words = (cap if cap is not None else text).replace("+", "").split(" ")
