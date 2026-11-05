@@ -1,0 +1,29 @@
+Сервер: root@201.24.56.21 (api.kubysh.com → 201.24.56.21)
+Postgres: backend-postgres-1
+Витрина на: 2026-11-05, сегодня: 2026-11-05
+  ok  01_mart_build_state.csv  1 строк
+  ok  02_releases.csv  19 строк
+  ok  03_appstore_daily.csv  761 строк
+  ok  04_appstore_sources_daily.csv  1406 строк
+  ok  05_people.csv  1056 строк
+  ok  06_person_days_mart.csv  2007 строк
+  ok  07_person_days_raw.csv  2058 строк
+  ok  08_person_events_raw.csv  34003 строк
+  ok  09_events_daily.csv  10758 строк
+  ok  10_events_rejected_daily.csv  776 строк
+  ok  11_installations.csv  1056 строк
+  ok  12_funnel_steps.csv  15129 строк
+  ok  13_paycheck_periods.csv  399 строк
+  ok  14_monetization_events.csv  2524 строк
+  ok  15_payments.csv  17 строк
+  ok  16_payment_steps.csv  9 строк
+  ok  17_subscriptions.csv  7 строк
+  ok  18_web_checkouts.csv  57 строк
+  ok  19_referrals.csv  1 строк
+  ok  20_bank_connections.csv  11 строк
+  ok  21_person_merge_log.csv  1 строк
+  ok  verify_dashboard.txt
+  ok  gtm_snapshot.txt
+
+Готово: /Users/kirillpopov/kubysh_prod_export/2026-11-05_0950.zip  (ошибок: 0)
+Сверка дашборда для глаз: /Users/kirillpopov/kubysh_prod_export/2026-11-05_0950/verify_dashboard.txt

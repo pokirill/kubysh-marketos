@@ -1,0 +1,98 @@
+=== A. Свежесть: as_of_date должен быть сегодняшним (иначе это замороженная база) ===
+   key   |         built_msk          | as_of_date | today_msk  | verdict 
+---------+----------------------------+------------+------------+---------
+ product | 2026-11-05 09:45:50.404517 | 2026-11-05 | 2026-11-05 | ok
+
+=== B. Сколько реальных людей: витрина против сырых событий ===
+ mart_people | raw_people_with_events | raw_people_first_launch | mart_without_raw_events | real_installations | installs_without_events | person_merges 
+-------------+------------------------+-------------------------+-------------------------+--------------------+-------------------------+---------------
+         969 |                    879 |                       0 |                      90 |                969 |                      90 |             0
+
+=== C. DAU / WAU / MAU на вчера (последний полный день, МСК) ===
+    day     | dau_raw | dau_mart | wau_raw | wau_mart | mau_raw | mau_mart 
+------------+---------+----------+---------+----------+---------+----------
+ 2026-11-04 |      46 |       49 |     131 |      135 |     355 |      358
+
+=== D. Недельные когорты: люди, план, G1, G2 — витрина против сырых событий ===
+    G2 = хотя бы один активный день с 7-го по 13-й день жизни среди зафиксировавших план (как в дашборде)
+ cohort_week | people_mart | first_day_differs | with_plan | g1_base | g1_hit | g2_base | g2_hit_mart | g2_hit_raw 
+-------------+-------------+-------------------+-----------+---------+--------+---------+-------------+------------
+ 2026-08-31  |          52 |                 3 |        16 |      16 |      3 |      16 |           1 |          1
+ 2026-09-07  |          31 |                 1 |         9 |       9 |      2 |       9 |           1 |          1
+ 2026-09-14  |          68 |                 2 |        28 |      28 |      2 |      28 |           1 |          1
+ 2026-09-21  |          67 |                 1 |        29 |      29 |      4 |      29 |           3 |          3
+ 2026-09-28  |          56 |                 5 |        20 |      20 |      6 |      20 |           6 |          6
+ 2026-10-05  |          78 |                10 |        31 |      31 |      6 |      31 |           3 |          3
+ 2026-10-12  |          65 |                10 |        30 |      30 |     10 |      30 |           6 |          6
+ 2026-10-19  |          60 |                 3 |        29 |      29 |      5 |      23 |           4 |          4
+ 2026-10-26  |          62 |                 7 |        36 |      36 |     12 |       0 |           0 |          0
+ 2026-11-02  |          81 |                 8 |        46 |      25 |      6 |       0 |           0 |          0
+
+=== E. Платящие: банк (payments) против витрины и событий приложения ===
+ confirmed_payments | paying_people_bank | rub_confirmed | paying_people_mart | purchase_succeeded_people | active_subscriptions 
+--------------------+--------------------+---------------+--------------------+---------------------------+----------------------
+                  3 |                  3 |          1070 |                  4 |                         4 |                    6
+
+=== F. Пейвол и переход к оплате: сырые события против витрины монетизации ===
+                name                | people_raw | people_mart 
+------------------------------------+------------+-------------
+ paycheck_phase_change              |        538 |           0
+ paycheck.opened                    |        538 |           0
+ paycheck_shown                     |        538 |           0
+ trial.offer_accepted               |        499 |         498
+ trial.quest_enrolled               |        496 |         495
+ pay.intro_shown                    |        387 |           0
+ paycheck.plan_fixed                |        361 |           0
+ trial_started                      |        260 |           0
+ paycheck.card_swiped               |        225 |           0
+ paycheck_metric_kit_opened         |        147 |           0
+ trial.quest_day_recorded           |        146 |         145
+ paycheck.plan_cta_shown            |        109 |           0
+ pay.support_shown                  |        103 |           0
+ paycheck.screenshot_entry_tap      |         96 |           0
+ paycheck.plan_cta_tapped           |         95 |           0
+ paycheck_reconcile_opened          |         82 |           0
+ paycheck_reconcile_applied         |         63 |           0
+ paywall.shown                      |         57 |          54
+ paycheck_forgotten_category_opened |         48 |           0
+ paycheck_metric_locked_tapped      |         43 |           0
+ paywall.cta_tapped                 |         37 |          34
+ checkout.started                   |         34 |          31
+ paycheck.closed                    |         33 |           0
+ paycheck_close_period              |         33 |           0
+ paycheck_close_facts_confirmed     |         32 |           0
+ purchase_decision.locked_tapped    |         26 |           0
+ trial.offer_shown                  |         25 |          25
+ paywall.dismissed                  |         23 |          20
+ paycheck.category_plan_changed     |         22 |           0
+ paycheck_category_plan_removed     |         22 |           0
+ paycheck.metric_locked_tapped      |         21 |           0
+ trial.quest_shown                  |         21 |          20
+ pay.support_tapped                 |         20 |           0
+ paycheck_forgotten_category_added  |         16 |           0
+ paycheck_wallet_daily_mode_changed |         16 |           0
+ paycheck.close_facts_confirmed     |         16 |           0
+ paycheck_category_plan_adjusted    |         15 |           0
+ paycheck_plan_fixed                |         11 |           0
+ paycheck_fix_with_deficit          |          9 |           0
+ paycheck.one_off_added             |          8 |           0
+ paycheck_category_plan_moved_next  |          7 |           0
+ trial.quest_dismissed              |          6 |           5
+ subscription.access_refreshed      |          2 |           2
+ paycheck_carryovers_declined_all   |          2 |           0
+ paycheck_carryover_applied         |          1 |           0
+ paycheck_kit_goal_cta              |          1 |           0
+ paycheck_carryovers_accepted_all   |          1 |           0
+ paycheck.period_reset              |          1 |           0
+ trial.quest_completed              |          1 |           1
+
+=== G. Загрузки App Store против первых запусков по неделям ===
+    week    | asc_units | raw_new_people | mart_new_people 
+------------+-----------+----------------+-----------------
+ 2026-09-28 |        16 |             51 |              56
+ 2026-10-05 |        80 |             74 |              78
+ 2026-10-12 |        68 |             55 |              65
+ 2026-10-19 |        63 |             60 |              60
+ 2026-10-26 |        58 |             53 |              62
+ 2026-11-02 |        56 |             75 |              81
+
