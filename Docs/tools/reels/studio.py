@@ -161,7 +161,7 @@ class Actor:
         while t < 120: self.blinks.append(t); t += r.uniform(2.0, 4.6)
         r2 = random.Random(name + "s"); self.sacc = [(i * 1.3, r2.uniform(-4, 4), r2.uniform(-3, 3)) for i in range(100)]
         self.phase = r.uniform(0, 6)
-        self.cur = None; self.bite = False
+        self.cur = None; self.bite = False; self.moods = []
 
     # --- команды сценария ---
     def go(self, t, x1, hop=70, step=170, dur=0.34):
@@ -176,6 +176,10 @@ class Actor:
     def look(self, t, target=None): self.looks.append((t, target))
     def react(self, t, kind): self.reacts.append((t, kind))
     def show(self, t, on=True): self.vis.append((t, on))
+    def mood(self, t0, t1, kind):
+        """Состояние на отрезке: tremble (дрожь паники), sweat (капли пота), heart (стучит сердце), sparkle (блеск успеха)."""
+        self.moods.append((t0, t1, kind))
+    def moods_at(self, t): return {k for t0, t1, k in self.moods if t0 <= t < t1}
     def spit_catch(self, t): self.coin_ev.append((t, "spit")); self.ep.sfx(t - 0.02, "thwip", 0.5); self.ep.sfx(t, "whoosh", 0.3)
     def toss(self, t): self.coin_ev.append((t, "toss")); self.ep.sfx(t, "thwip", 0.35); self.ep.sfx(t + 0.4, "clink", 0.55)
     def bite_coin(self, t):
@@ -279,7 +283,10 @@ class Actor:
         x, h, sq, tilt = self.body(t)
         sx, sy = to_screen(cam, x, self.ground); s = self.s * cam[2]; hop = h * cam[2]
         talk = self.talk(t)
-        sq += 0.012 * math.sin(2 * math.pi * t / 2.4 + self.phase) + 0.03 * talk
+        sq += 0.012 * math.sin(2 * math.pi * t / 2.4 + self.phase) + 0.06 * talk
+        hop += 16 * talk * abs(math.sin(2 * math.pi * 2.2 * t + self.phase)) * cam[2]
+        md = self.moods_at(t)
+        if "tremble" in md: sx += 6 * math.sin(2 * math.pi * 21 * t) * cam[2]; tilt += 2.5 * math.sin(2 * math.pi * 13 * t)
         tilt += 0.8 * math.sin(2 * math.pi * t / 3.7 + self.phase) + 2.4 * talk * math.sin(2 * math.pi * 2.7 * t + self.phase)
         sc = self.s
         for t0, kind in self.reacts:
@@ -334,6 +341,26 @@ class Actor:
                 cp = cstate[1]
             comp(img, cs, cp[0] - cs.width / 2, cp[1] - cs.height / 2)
         self.last = (sx, sy, s, sq, tilt, hop)
+        if md: self._mood_fx(img, t, md, s)
+
+    def _mood_fx(self, img, t, md, s):
+        hx, hy = self.head(); u = s * 1.4
+        lay = Image.new("RGBA", img.size, (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+        if "sweat" in md:
+            for i in range(3):
+                k = ((t * 0.9 + i / 3) % 1.0); x = hx + (-150 + 300 * (i % 2) + 40 * i) * u; y = hy + (-20 + 260 * k) * u; r = 16 * u
+                a = int(255 * (1 - k))
+                d.polygon([(x, y - 2.2 * r), (x - r, y), (x + r, y)], fill=(120, 200, 255, a)); d.ellipse([x - r, y - r, x + r, y + r], fill=(120, 200, 255, a))
+        if "heart" in md:
+            b = 1 + 0.25 * max(0, math.sin(2 * math.pi * 2.3 * t)) ** 8; r = 34 * u * b; x, y = hx + 170 * u, hy - 120 * u
+            d.ellipse([x - r, y - r, x, y], fill=(235, 60, 70, 255)); d.ellipse([x, y - r, x + r, y], fill=(235, 60, 70, 255))
+            d.polygon([(x - r, y - r / 2), (x + r, y - r / 2), (x, y + r)], fill=(235, 60, 70, 255))
+        if "sparkle" in md:
+            for i in range(4):
+                ph = (t * 1.3 + i * 0.27) % 1.0; a = math.sin(math.pi * ph); ang = i * 1.7
+                x, y = hx + 190 * u * math.cos(ang), hy - 40 * u + 150 * u * math.sin(ang); r = 30 * u * a
+                if r > 1: d.polygon([(x, y - r), (x + r * 0.28, y - r * 0.28), (x + r, y), (x + r * 0.28, y + r * 0.28), (x, y + r), (x - r * 0.28, y + r * 0.28), (x - r, y), (x - r * 0.28, y - r * 0.28)], fill=(255, 230, 120, int(255 * a)))
+        base = img.convert("RGBA"); base.alpha_composite(lay); img.paste(base.convert(img.mode))
 
     def head(self):
         sx, sy, s, sq, tilt, hop = self.last
