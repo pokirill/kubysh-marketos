@@ -31,7 +31,7 @@ def banks(t, t0, t_ok):
             check(d, x0 + 560, y + 60); d.text((x0 + 840, y + 58), "Подключено", font=PH.font("Bold", 38), fill=PH.GREEN, anchor="rm")
         else:
             d.rounded_rectangle([x0 + 620, y + 26, x0 + 840, y + 90], 32, fill=(30, 130, 88)); d.text((x0 + 730, y + 58), "Войти", font=PH.font("Bold", 36), fill=PH.WHITE, anchor="mm")
-    d.text((x0, y0 + 540), "вход на странице банка · пароль Кубыш не видит", font=PH.font("SemiBold", 30), fill=PH.SUB)
+    d.text((x0, y0 + 540), "вход на странице банка при обновлении · пароль Кубыш не видит", font=PH.font("SemiBold", 30), fill=PH.SUB)
     return cv
 
 
@@ -71,8 +71,8 @@ def build():
     dush.expr(a1 - 1.2, "sleepy")
     # 2 · Кубыш: войди в банк один раз
     kub.show(a1); kub.go(a1, 790, hop=90, step=350); kub.expr(a1, "proud"); kub.mood(a1, 999, "sparkle"); dush.go(a1, 270, hop=50, step=300)
-    b0, b1 = say("kubysh", "q4", "И не надо. Один раз войди в свой банк: Т-Банк, Сбер или Яндекс. *Дальше траты приходят сами*", at=a1 + 0.7, a=kub)
-    t_ok = b0 + 4.6; card_at(ep, b0, b1 + 0.3, lambda t: banks(t, b0, t_ok), 70, 200); ep.sfx(t_ok, "ding", 0.45)
+    b0, b1 = say("kubysh", "q4", "И не надо. Войди в свой банк прямо из приложения, *и траты подтянутся сами*", at=a1 + 0.7, a=kub)
+    t_ok = b0 + 3.0; card_at(ep, b0, b1 + 0.3, lambda t: banks(t, b0, t_ok), 70, 200); ep.sfx(t_ok, "ding", 0.45)
     dush.expr(b0, "skeptic")
     # 3 · лента трат
     c0, c1 = say("kubysh", "q5", "Смотри, вся неделя уже в ленте, *по категориям*", at=b1 + 0.3, a=kub)

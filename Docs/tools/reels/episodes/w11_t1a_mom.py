@@ -10,14 +10,14 @@ from episodes.w07_common import setup, sayer, finale, badge
 frog.DUSH_SIMPLE = True
 V = "/Users/kirillpopov/Documents/Кубыш доки и артефакты /Голоса/W11_Банки/"
 BEACH = "/Users/kirillpopov/Documents/Кубыш доки и артефакты /Рилсы маскот/пляж.png"
-LADDER = [("Каждый день", "все четко"), ("Раз в 3 дня", "сколько на день"), ("Раз в неделю", "хватит ли до зарплаты"), ("Раз в 2 недели", "сколько отложить с получки")]
+LADDER = [("Раз в день", "полный контроль"), ("Раз в 3 дня", "сколько тратить на день"), ("Раз в неделю", "хватит ли до зарплаты"), ("Раз в 2 недели", "сколько отложить")]
 
 
-def ladder(t, t0, t1):
+def ladder(t, ts):
     cv, pad = PH.card(960, 700, 40, glow=PH.GREEN); d = ImageDraw.Draw(cv); x0, y0 = pad + 36, pad + 34
-    d.text((x0, y0), "Как часто заглядывать", font=PH.font("Bold", 48), fill=PH.WHITE)
+    d.text((x0, y0), "Выбери свой ритм", font=PH.font("Bold", 48), fill=PH.WHITE)
     for i, (a, b) in enumerate(LADDER):
-        st = t0 + (t1 - t0) * (0.02 + 0.245 * i); k = eout(seg(t, st, st + 0.4))
+        st = ts[i]; k = eout(seg(t, st, st + 0.4))
         if k <= 0: continue
         y = y0 + 110 + i * 140; x = x0 + (3 - i) * 50
         d.rounded_rectangle([x, y, x + 620, y + 116], 24, fill=(34, 66, 52) if i else (30, 130, 88))
@@ -53,9 +53,14 @@ def build():
     f0, f1 = say("kubysh", "q2", "Ничего не записываю. *Траты сами приходят из банка*, я просто заглядываю", at=e1 + 0.3, a=kub)
     for i, s in enumerate(["Кофе 350", "Продукты 2 150", "Такси 640"]):
         tt = f0 + 1.6 + 0.4 * i; ep.pill(tt, f1 + 0.2, s, 300 + 240 * i, 380 + 90 * i, size=46, **STY["dark"]); ep.sfx(tt, "tick", 0.4)
-    g0, g1 = say("kubysh", "q3", "Каждый день: все четко. Раз в три дня: сколько на день. Раз в неделю: хватит ли до зарплаты. *Раз в две недели: сколько отложить с получки*", at=f1 + 0.3, a=kub)
-    ep.add(g0, g1 + 0.3, "screen", lambda img, t, cam: comp(img, fade(ladder(t, g0, g1), eout(seg(t, g0, g0 + 0.3)) * (1 - ease(seg(t, g1 + 0.05, g1 + 0.3)))), 40, 170))
-    for i in range(4): ep.sfx(g0 + (g1 - g0) * (0.02 + 0.245 * i), "tick", 0.45)
+    g0, gx = say("kubysh", "l0", "Я заглядываю, *когда мне нужно*", at=f1 + 0.3, a=kub)
+    ts = []
+    for f, cap in [("l1", "Хочешь полный контроль: *раз в день*"), ("l2", "Знать, сколько тратить на день: *раз в три дня*"),
+                   ("l3", "Хватит ли до зарплаты: *раз в неделю*"), ("l4", "Сколько отложить: *раз в две недели*")]:
+        a_, gx = say("kubysh", f, cap, at=gx + 0.15, a=kub); ts.append(a_)
+    g1 = gx
+    ep.add(g0, g1 + 0.3, "screen", lambda img, t, cam: comp(img, fade(ladder(t, ts), eout(seg(t, g0, g0 + 0.3)) * (1 - ease(seg(t, g1 + 0.05, g1 + 0.3)))), 40, 170))
+    for x in ts: ep.sfx(x, "tick", 0.45)
     ep.clip(tb, g1 + 0.3, BEACH, "пляж")
     # 3 · Душная тайком
     th = g1 + 0.3; kub.show(th, False); dush.show(th); dush.expr(th, "side"); ep.sfx(th, "swish", 0.45)

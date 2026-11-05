@@ -848,6 +848,8 @@ class Ep:
                 cw += (sp if lines[-1] else 0) + im.width; lines[-1].append((im, tw))
             y0 = c["y"] if c["y"] is not None else 1290
             lh = int(size * 1.25); out = seg(t, min(c["t1"], nxt) - 0.12, min(c["t1"], nxt))
+            if y0 + len(lines) * lh > H - 60 and not c.get("_warn"):
+                c["_warn"] = 1; print(f"⚠ подпись не влезает ({len(lines)} строк, низ {y0 + len(lines) * lh}): {c.get('cap', '')[:50]}")
             av = getattr(self, "avatars", {}).get(c["who"])
             if av is not None and lines and t >= c["times"][0]:   # портрет говорящего слева от первой строки
                 w0 = sum(im.width for im, _ in lines[0]) + sp * (len(lines[0]) - 1); x0 = (W - w0) / 2 - 20
